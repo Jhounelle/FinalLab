@@ -2,13 +2,11 @@
     <div class="checkout">
       <h2>Checkout</h2>
   
-      <!-- If the cart is empty, show a message -->
       <div v-if="cart.length === 0">
         <p>Your cart is empty. Please add some items to proceed.</p>
         <router-link to="/store" class="btn btn-primary">Go to Store</router-link>
       </div>
-  
-      <!-- If the cart is not empty, show the checkout details -->
+
       <div v-else>
         <h3>Order Summary</h3>
         <div class="cart-items">
@@ -64,13 +62,11 @@
     },
     methods: {
       submitOrder() {
-        // Handle the order submission (e.g., send it to an API or mock backend)
+    
         alert('Order placed successfully!');
   
-        // Clear the cart after order is placed
         this.$store.commit('clearCart');
-  
-        // Redirect to the homepage
+
         this.$router.push('/');
       }
     }

@@ -1,10 +1,9 @@
 import { createRouter, createWebHistory } from 'vue-router';
 
-// Use relative paths to test
 import HomePage from '../views/HomePage.vue';
-import UserCart from '../components/UserCart.vue';
 import CheckoutPage from '../components/CheckoutPage.vue';
-import UserRegistration from '../components/UserRegistration.vue';
+import UserRegistration from '../views/UserRegistration.vue';
+import LoginPage from '@/views/LoginPage.vue';
 
 const routes = [
   {
@@ -13,9 +12,19 @@ const routes = [
     component: HomePage
   },
   {
+    path: '/login',
+    name: 'Login',
+    component: LoginPage
+  },
+  {
+    path: '/register',
+    name: 'register',
+    component: UserRegistration
+  },
+  {
     path: '/cart',
     name: 'cart',
-    component: UserCart
+    component: () => import('@/views/UserCart.vue')
   },
   {
     path: '/checkout',

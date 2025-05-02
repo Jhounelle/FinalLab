@@ -2,7 +2,6 @@
   <div class="admin-panel">
     <h2>Admin Panel</h2>
     
-    <!-- Tab Navigation -->
     <ul class="nav nav-tabs" id="adminTabs" role="tablist">
       <li class="nav-item" role="presentation">
         <a class="nav-link active" id="manage-products-tab" data-bs-toggle="tab" href="#manage-products" role="tab" aria-controls="manage-products" aria-selected="true">Manage Products</a>
@@ -12,10 +11,8 @@
       </li>
     </ul>
 
-    <!-- Tab Content -->
     <div class="tab-content" id="adminTabsContent">
       
-      <!-- Manage Products Tab -->
       <div class="tab-pane fade show active" id="manage-products" role="tabpanel" aria-labelledby="manage-products-tab">
         <div class="product-list">
           <h3>Product List</h3>
@@ -41,7 +38,6 @@
           <button class="btn btn-primary" @click="showAddProductModal">Add Product</button>
         </div>
 
-        <!-- Add/Edit Product Modal -->
         <div class="modal" tabindex="-1" :class="{'d-block': showModal}" style="display: block;">
           <div class="modal-dialog">
             <div class="modal-content">
@@ -67,7 +63,6 @@
         </div>
       </div>
 
-      <!-- View Transactions Tab -->
       <div class="tab-pane fade" id="view-transactions" role="tabpanel" aria-labelledby="view-transactions-tab">
         <h3>Transaction History</h3>
         <table class="table">
@@ -98,12 +93,12 @@
 export default {
   data() {
     return {
-      products: [], // List of products
-      transactions: [], // List of transactions
-      product: { name: '', price: 0 }, // Product object for Add/Edit
-      showModal: false, // To toggle modal visibility
-      isEditMode: false, // If true, it's edit mode
-      currentProductId: null // Used to identify the product being edited
+      products: [], 
+      transactions: [], 
+      product: { name: '', price: 0 }, 
+      showModal: false, 
+      isEditMode: false, 
+      currentProductId: null 
     };
   },
   created() {
@@ -112,16 +107,14 @@ export default {
   },
   methods: {
     fetchProducts() {
-      // Fetch products from an API or Vuex store
-      // For now, it's mocked
+
       this.products = [
         { id: 1, name: 'Product 1', price: 20.0 },
         { id: 2, name: 'Product 2', price: 30.0 }
       ];
     },
     fetchTransactions() {
-      // Fetch transactions from an API or Vuex store
-      // For now, it's mocked
+
       this.transactions = [
         { id: 101, customerName: 'John Doe', total: 50.0, status: 'Completed' },
         { id: 102, customerName: 'Jane Smith', total: 70.0, status: 'Pending' }
@@ -130,21 +123,20 @@ export default {
     showAddProductModal() {
       this.showModal = true;
       this.isEditMode = false;
-      this.product = { name: '', price: 0 }; // Reset the product form
+      this.product = { name: '', price: 0 }; 
     },
     closeModal() {
       this.showModal = false;
     },
     saveProduct() {
       if (this.isEditMode) {
-        // Update product logic (e.g., send PUT request to server)
+       
         alert(`Product ${this.product.name} updated!`);
       } else {
-        // Add new product logic (e.g., send POST request to server)
+     
         alert(`Product ${this.product.name} added!`);
       }
 
-      // After saving, close the modal and refresh product list
       this.showModal = false;
       this.fetchProducts();
     },
@@ -152,11 +144,11 @@ export default {
       this.currentProductId = productId;
       this.isEditMode = true;
       const product = this.products.find(p => p.id === productId);
-      this.product = { ...product }; // Populate the product form with the selected product
+      this.product = { ...product }; 
       this.showModal = true;
     },
     deleteProduct(productId) {
-      // Delete product logic (e.g., send DELETE request to server)
+
       this.products = this.products.filter(p => p.id !== productId);
       alert('Product deleted!');
     }

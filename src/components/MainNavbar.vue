@@ -1,7 +1,7 @@
 <template>
   <nav class="navbar navbar-expand-lg navbar-light bg-light">
     <div class="container-fluid">
-      <router-link class="navbar-brand" to="/">My Shop</router-link>
+      <router-link class="navbar-brand" to="/">Scentora</router-link>
       
       <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
         <span class="navbar-toggler-icon"></span>
@@ -9,34 +9,27 @@
       
       <div class="collapse navbar-collapse" id="navbarNav">
         <ul class="navbar-nav ms-auto">
-          <!-- Home Link -->
+         
           <li class="nav-item">
             <router-link class="nav-link" to="/">Home</router-link>
           </li>
           
-          <!-- Store Link -->
           <li class="nav-item">
-            <router-link class="nav-link" to="/store">Store</router-link>
+            <router-link class="nav-link" to="/product">Products</router-link>
           </li>
           
-          <!-- Cart Link -->
           <li class="nav-item">
             <router-link class="nav-link" to="/cart">
               Cart <span class="badge bg-primary">{{ cartItemCount }}</span>
             </router-link>
           </li>
 
-          <!-- Admin Panel Link (Conditional on Admin Status) -->
           <li v-if="isAdmin" class="nav-item">
             <router-link class="nav-link" to="/admin-panel">Admin Panel</router-link>
           </li>
 
-          <!-- Authentication Links -->
           <li v-if="!isAuthenticated" class="nav-item">
             <router-link class="nav-link" to="/login">Login</router-link>
-          </li>
-          <li v-if="!isAuthenticated" class="nav-item">
-            <router-link class="nav-link" to="/signup">Sign Up</router-link>
           </li>
           <li v-if="isAuthenticated" class="nav-item">
             <button class="nav-link btn btn-link" @click="logout">Logout</button>
@@ -50,7 +43,6 @@
 <script>
 export default {
   computed: {
-    // Correct getter usage
     cartItemCount() {
       return this.$store.getters.cartItemCount;
     },
@@ -63,7 +55,7 @@ export default {
   },
   methods: {
     logout() {
-      this.$store.commit('SET_AUTH', false); // Match your store mutation
+      this.$store.commit('SET_AUTH', false); 
       this.$store.commit('CLEAR_CART');
       this.$router.push('/');
     }
