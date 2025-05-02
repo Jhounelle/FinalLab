@@ -2,7 +2,6 @@
   <div class="container mt-5">
     <h2 class="mb-4">Welcome to the Store</h2>
 
-    <!-- Search bar -->
     <div class="input-group mb-4">
       <input
         v-model="searchQuery"
