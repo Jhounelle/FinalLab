@@ -11,7 +11,6 @@
       />
     </div>
 
-    <!-- Product list -->
     <div class="row">
       <div
         class="col-md-4 mb-4"
