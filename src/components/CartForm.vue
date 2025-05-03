@@ -1,7 +1,7 @@
 <!-- src/components/CartForm.vue -->
 <template>
   <form>
-    <div class="mb-3">
+    <div class=" container mb-3">
       <label for="exampleInput" class="form-label">Sample Field</label>
       <input type="text" class="form-control" id="exampleInput">
     </div>
@@ -14,3 +14,11 @@ export default {
   name: 'CartForm'
 };
 </script>
+
+<style>
+
+ container{
+  z-index: 9999;
+ }
+
+</style>

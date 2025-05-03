@@ -23,7 +23,7 @@ export default {
   font-family: 'Poppins', sans-serif;
   font-weight: 300;
   font-size: 0.8rem;
-  margin-top: auto;       
+  margin-top: auto;   
 }
 
 p {

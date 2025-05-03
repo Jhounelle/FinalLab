@@ -28,6 +28,7 @@ html, body, #app {
 }
 
 #app {
+  padding-top: 40px;
   display: flex;
   flex-direction: column;
 }

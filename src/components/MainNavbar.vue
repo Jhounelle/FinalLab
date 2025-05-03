@@ -1,7 +1,7 @@
 <template>
   <div>
     <!-- NAVBAR -->
-    <nav class="navbar navbar-expand-lg custom-navbar">
+    <nav class="navbar navbar-expand-lg custom-navbar fixed-top">
       <div class="container-fluid">
 
         <router-link class="navbar-brand d-none d-lg-block" to="/">
@@ -27,23 +27,25 @@
         </button>
 
 
-    <!-- Mobile-only avatar and cart -->
-      <div class="d-lg-none d-flex align-items-center ms-auto">
-        <router-link v-if="!isAuthenticated" class="nav-link text-white me-2" to="/login">
-          <i class="fa-regular fa-user"></i>
-        </router-link>
+        <!-- Mobile-only avatar and cart -->
+        <div class="d-lg-none d-flex align-items-center ms-auto">
+          <router-link v-if="!isAuthenticated" class="nav-link text-white me-2" to="/login">
+            <i class="fa-regular fa-user"></i>
+          </router-link>
 
-        <a
-          class="nav-link text-white"
-          data-bs-toggle="offcanvas"
-          href="#offcanvasCart"
-          role="button"
-          aria-controls="offcanvasCart"
-        >
-          <i class="fa-solid fa-cart-shopping"></i>
-          <span class="badge bg-primary">{{ cartItemCount }}</span>
-        </a>
-      </div>
+          <a
+            class="nav-link text-white position-relative"
+            data-bs-toggle="offcanvas"
+            href="#offcanvasCart"
+            role="button"
+            aria-controls="offcanvasCart"
+          >
+            <i class="fa-solid fa-cart-shopping"></i>
+            <span class="cart-badge badge bg-primary position-absolute">
+              {{ cartItemCount }}
+            </span>
+          </a>
+        </div>
 
         <div class="collapse navbar-collapse" id="navbarNav">
           <ul class="navbar-nav ms-auto">
@@ -53,7 +55,7 @@
               </router-link>
             </li>
 
-            <li class="nav-item">
+            <li class="nav-item position-relative">
               <a
                 class="nav-link"
                 data-bs-toggle="offcanvas"
@@ -61,8 +63,12 @@
                 role="button"
                 aria-controls="offcanvasCart"
               >
-                <i class="fa-solid fa-cart-shopping"></i>
-                <span class="badge bg-primary">{{ cartItemCount }}</span>
+                <div class="cart-icon-wrapper position-relative d-inline-block">
+                  <i class="fa-solid fa-cart-shopping"></i>
+                  <span class="cart-badge badge bg-primary position-absolute">
+                    {{ cartItemCount }}
+                  </span>
+                </div>
               </a>
             </li>
 
@@ -157,15 +163,19 @@ export default {
 .navbar {
   height: 80px;
   align-items: center;
+  position: fixed; 
+  top: 0;
+  width: 100%;
+  z-index: 1000;
+}
+
+.custom-navbar {
+  background-color: #29000a;
 }
 
 .navbar-brand img {
   display: block;
   max-height: 80px;
-}
-
-.custom-navbar {
-  background-color: #29000a;
 }
 
 .navbar-nav .nav-link {
@@ -184,9 +194,21 @@ export default {
   transform: translateX(-50%);
 }
 
-.navbar {
-  height: 80px;
-  align-items: center;
-  position: relative; /* Needed for absolute logo centering */
+.cart-icon-wrapper {
+  font-size: 14px;
 }
+
+.cart-badge {
+  top: -8px;
+  right: -10px;
+  border-radius: 50%;
+  padding: 4px 6px;
+  font-size: 10px;
+  min-width: 18px;
+  height: 18px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
 </style>
