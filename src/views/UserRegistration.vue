@@ -1,64 +1,72 @@
 <template>
-  <div class="registration-form">
-    <h2>Register</h2>
-
-    <form @submit.prevent="submitForm">
-      <div class="mb-3">
-        <label for="name" class="form-label">Full Name</label>
-        <input
-          type="text"
-          class="form-control"
-          id="name"
-          v-model="name"
-          :class="{'is-invalid': errors.name}"
-          required
-        />
-        <div class="invalid-feedback">{{ errors.name }}</div>
+  <div class="container mt-5" style="max-width: 500px">
+    <div class="card">
+      <div class="card-body">
+        <h3 class="card-title text-center mb-4">SIGN UP</h3>
+        <div class="textLabel">Please fill in the information below:</div>
+        <form @submit.prevent="submitForm">
+          <div class="mb-3">
+            <input
+              type="text"
+              v-model="firstname"
+              class="form-control"
+              required
+              placeholder="First Name"
+            />
+          </div>
+          <div class="mb-3">
+            <input
+              type="text"
+              v-model="lastname"
+              class="form-control"
+              required
+              placeholder="Last Name"
+            />
+          </div>
+          <div class="mb-3">
+            <input
+              type="text"
+              v-model="location"
+              class="form-control"
+              required
+              placeholder="Location"
+            />
+          </div>
+          <div class="mb-3">
+            <input
+              type="email"
+              v-model="email"
+              class="form-control"
+              required
+              placeholder="Email"
+            />
+          </div>
+          <div class="mb-3">
+            <input
+              type="password"
+              v-model="password"
+              class="form-control"
+              required
+              placeholder="Password"
+            />
+          </div>
+          <div class="mb-3">
+            <input
+              type="password"
+              v-model="confirmpassword"
+              class="form-control"
+              required
+              placeholder="Confirm Password"
+            />
+          </div>
+          <button type="submit" class="btn btn-primary w-100">Register</button>
+        </form>
+        <p class="mt-3 text-center">
+          Already have an account?
+          <router-link to="/login">Login here</router-link>
+        </p>
       </div>
-
-      <div class="mb-3">
-        <label for="email" class="form-label">Email</label>
-        <input
-          type="email"
-          class="form-control"
-          id="email"
-          v-model="email"
-          :class="{'is-invalid': errors.email}"
-          required
-        />
-        <div class="invalid-feedback">{{ errors.email }}</div>
-      </div>
-
-      <div class="mb-3">
-        <label for="password" class="form-label">Password</label>
-        <input
-          type="password"
-          class="form-control"
-          id="password"
-          v-model="password"
-          :class="{'is-invalid': errors.password}"
-          required
-        />
-        <div class="invalid-feedback">{{ errors.password }}</div>
-      </div>
-
-      <div class="mb-3">
-        <label for="confirmPassword" class="form-label">Confirm Password</label>
-        <input
-          type="password"
-          class="form-control"
-          id="confirmPassword"
-          v-model="confirmPassword"
-          :class="{'is-invalid': errors.confirmPassword}"
-          required
-        />
-        <div class="invalid-feedback">{{ errors.confirmPassword }}</div>
-      </div>
-
-      <button type="submit" class="btn btn-primary" :disabled="isSubmitting">
-        Register
-      </button>
-    </form>
+    </div>
   </div>
 </template>
 
@@ -66,32 +74,46 @@
 export default {
   data() {
     return {
-      name: '',
+      firstname: '',
+      lastname: '',
+      location: '',
       email: '',
       password: '',
-      confirmPassword: '',
+      confirmpassword: '',
       isSubmitting: false,
       errors: {
-        name: '',
+        firstname: '',
+        lastname: '',
+        location: '',
         email: '',
         password: '',
-        confirmPassword: ''
+        confirmpassword: ''
       }
     };
   },
   methods: {
     validateForm() {
       this.errors = {
-        name: '',
+        firstname: '',
+        lastname: '',
+        location: '',
         email: '',
         password: '',
-        confirmPassword: ''
+        confirmpassword: ''
       };
 
       let isValid = true;
 
-      if (!this.name) {
-        this.errors.name = 'Full name is required.';
+      if (!this.firstname) {
+        this.errors.firstname = 'First name is required.';
+        isValid = false;
+      }
+      if (!this.lastname) {
+        this.errors.lastname = 'Last name is required.';
+        isValid = false;
+      }
+      if (!this.location) {
+        this.errors.location = 'Location is required.';
         isValid = false;
       }
 
@@ -109,8 +131,8 @@ export default {
         isValid = false;
       }
 
-      if (this.password !== this.confirmPassword) {
-        this.errors.confirmPassword = 'Passwords do not match.';
+      if (this.password !== this.confirmpassword) {
+        this.errors.confirmpassword = 'Passwords do not match.';
         isValid = false;
       }
 
@@ -123,14 +145,17 @@ export default {
 
       this.isSubmitting = true;
 
+      // Simulate form submission
       setTimeout(() => {
         this.isSubmitting = false;
         alert('Registration successful!');
 
-        this.name = '';
+        this.firstname = '';
+        this.lastname = '';
+        this.location = '';
         this.email = '';
         this.password = '';
-        this.confirmPassword = '';
+        this.confirmpassword = '';
       }, 2000);
     }
   }
@@ -138,68 +163,81 @@ export default {
 </script>
 
 <style scoped>
-.registration-form {
-  max-width: 420px;
-  margin: 2rem auto;
-  padding: 2rem;
-  border-radius: 16px;
-  background-color: #ffffff;
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.06);
+.container {
+  background-color: #d9d9d9;
+  border-radius: 12px;
 }
 
-h2 {
-  text-align: center;
-  margin-bottom: 1.5rem;
+.card {
+  border: none;
+  border-radius: 16px;
+  background-color: #d9d9d9;
+  box-shadow: none;
+}
+
+.card-body {
+  padding: 2rem;
+}
+
+.card-title {
   font-weight: 700;
-  font-size: 1.8rem;
   color: #121212;
+  font-size: 1.75rem;
+  font-family: Poppins, 'sans-serif';
 }
 
 label {
   font-weight: 500;
-  margin-bottom: 6px;
+  margin-bottom: 5px;
   color: #121212;
 }
 
-.form-control {
-  border-radius: 10px;
-  padding: 12px;
-  font-size: 1rem;
+.textLabel {
+  font-size: 0.8rem;
+  color: #121212;
+  text-align: center;
+  margin-bottom: 30px;
+}
+
+input.form-control {
+  border-radius: 8px;
+  padding: 10px 12px;
   border: 1px solid #ccc;
-  transition: border-color 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
-}
-
-.form-control:focus {
-  border-color: #1db954;
-  box-shadow: 0 0 0 0.15rem rgba(30, 215, 96, 0.25);
-}
-
-.invalid-feedback {
-  display: block;
-  font-size: 0.875rem;
-  color: #dc3545;
-  margin-top: 0.25rem;
-}
-
-button {
-  margin-top: 1rem;
-  padding: 12px;
-  width: 100%;
-  font-weight: 600;
   font-size: 1rem;
-  background-color: #000;
-  color: #fff;
+}
+
+input.form-control:focus {
+  border-color: #d9ad9a;
+  box-shadow: 0 0 0 0.15rem #a26d5c;
+}
+
+.btn-primary {
+  background-color: #29000a;
   border: none;
-  border-radius: 10px;
+  font-weight: 600;
+  padding: 10px 16px;
+  border-radius: 8px;
   transition: background-color 0.3s ease;
 }
 
-button:hover {
-  background-color: #1a1a1a;
+.btn-primary:hover {
+  background-color: rgb(255, 255, 255);
+  border: 1px solid #29000a;
+  color: #29000a;
 }
 
-button:disabled {
-  background-color: #aaa;
-  cursor: not-allowed;
+p {
+  color: rgb(0, 0, 0);
+  font-size: 14px;
+}
+
+a {
+  color: rgb(207, 59, 0);
+  text-decoration: none;
+  font-weight: 500;
+}
+
+a:hover {
+  text-decoration: underline;
 }
 </style>

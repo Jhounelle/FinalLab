@@ -1,27 +1,26 @@
 <template>
   <div class="container mt-5" style="max-width: 500px">
-    <div class="card shadow-sm">
+    <div class="card">
       <div class="card-body">
-        <h3 class="card-title text-center mb-4">Login</h3>
+        <h3 class="card-title text-center mb-4">LOGIN</h3>
+        <div class="textLabel">Enter your email and password to login:</div>
         <form @submit.prevent="handleLogin">
           <div class="mb-3">
-            <label>Email</label>
             <input
               type="email"
               v-model="email"
               class="form-control"
               required
-              placeholder="Enter your email"
+              placeholder="Email"
             />
           </div>
           <div class="mb-3">
-            <label>Password</label>
             <input
               type="password"
               v-model="password"
               class="form-control"
               required
-              placeholder="Enter your password"
+              placeholder="Password"
             />
           </div>
           <button type="submit" class="btn btn-primary w-100">Login</button>
@@ -62,16 +61,16 @@ export default {
 
 <style scoped>
 .container {
-  background-color: #f9f9f9;
-  padding: 2rem;
+  background-color: #D9D9D9;
+  padding: 4rem 0rem;
   border-radius: 12px;
 }
 
 .card {
   border: none;
   border-radius: 16px;
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
-  background-color: #ffffff;
+  background-color: #D9D9D9;
+  box-shadow: none;
 }
 
 .card-body {
@@ -82,12 +81,20 @@ export default {
   font-weight: 700;
   color: #121212;
   font-size: 1.75rem;
+  font-family: Poppins, 'sans-serif';
 }
 
 label {
   font-weight: 500;
   margin-bottom: 5px;
   color: #121212;
+}
+
+.textLabel {
+  font-size: 0.8rem;
+  color: #121212;
+  text-align: center;
+  margin-bottom: 30px;
 }
 
 input.form-control {
@@ -98,12 +105,12 @@ input.form-control {
 }
 
 input.form-control:focus {
-  border-color: #1db954;
-  box-shadow: 0 0 0 0.15rem rgba(30, 215, 96, 0.25);
+  border-color: #D9AD9A;
+  box-shadow: 0 0 0 0.15rem #A26D5C;
 }
 
 .btn-primary {
-  background-color: #000;
+  background-color: #29000A;
   border: none;
   font-weight: 600;
   padding: 10px 16px;
@@ -112,15 +119,18 @@ input.form-control:focus {
 }
 
 .btn-primary:hover {
-  background-color: #1a1a1a;
+  background-color:rgb(255, 255, 255);
+  border: 1px solid #29000A;
+  color: #29000A;
 }
 
 p {
-  color: #333;
+  color:rgb(0, 0, 0);
+  font-size: 14px;
 }
 
 a {
-  color: #1db954;
+  color:rgb(207, 59, 0);
   text-decoration: none;
   font-weight: 500;
 }
