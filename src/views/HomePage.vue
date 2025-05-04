@@ -46,7 +46,12 @@
             <div class="card-body">
             <h5 class="card-title">{{ product.name }}</h5>
             <p class="card-text">₱{{ product.price }}</p>
-            <p class="card-text text-muted">{{ product.description }}</p>
+            <button
+              class="btn btn-black w-100"
+              @click="$router.push(`/product/${product.id}`)"
+            >
+              View Product
+            </button>
             <button
               class="btn btn-black w-100"
               @click="handleAddToCart(product)"

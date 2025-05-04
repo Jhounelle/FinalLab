@@ -4,6 +4,8 @@
     <div class="product-info">
       <h5 class="product-name">{{ product.name }}</h5>
       <p class="product-price">${{ product.price.toFixed(2) }}</p>
+      
+      
       <button 
         class="btn btn-primary" 
         @click="addToCart" 

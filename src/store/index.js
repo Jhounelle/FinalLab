@@ -35,7 +35,7 @@ export default createStore({
   actions: {
     fetchProducts({ commit }) {
       const sampleProducts = [
-        { id: 1, name: 'Noir Drift', price: 599, image: 'noir-drift.jpg'},
+        { id: 1, name: 'Noir Drift', price: 599, image: 'noir-drift.jpg', description: 'tung tung tung sahur'},
         { id: 2, name: 'Iron Woods', price: 599, image: 'iron-woods.jpg'},
         { id: 3, name: 'Azure Pulse', price: 599, image: 'azure-pulse.jpg'},
         { id: 4, name: 'Bloom Veil ', price: 599, image: 'bloom-veil.jpg'},

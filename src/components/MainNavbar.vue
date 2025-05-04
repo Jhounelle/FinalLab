@@ -167,6 +167,7 @@ export default {
   top: 0;
   width: 100%;
   z-index: 1000;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3); 
 }
 
 .custom-navbar {
@@ -195,7 +196,7 @@ export default {
 }
 
 .cart-icon-wrapper {
-  font-size: 14px;
+  font-size: 16px;
 }
 
 .cart-badge {

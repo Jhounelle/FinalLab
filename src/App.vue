@@ -1,6 +1,6 @@
 <template>
   <div id="app">
-    <MainNavbar />
+    <component :is="currentNavbar" />
     <div class="content">
       <router-view />
     </div>
@@ -10,16 +10,25 @@
 
 <script>
 import MainNavbar from './components/MainNavbar.vue';
+import CheckoutNavbar from './components/CheckoutNavbar.vue'; 
 import FooterComponent from './components/FooterComponent.vue';
 
 export default {
   name: 'App',
   components: {
     MainNavbar,
-    FooterComponent
+    CheckoutNavbar,
+    FooterComponent,
+  },
+  computed: {
+    currentNavbar() {
+      // Check if current route is '/checkout' or anything related
+      return this.$route.path.includes('/checkout') ? 'CheckoutNavbar' : 'MainNavbar';
+    }
   }
 };
 </script>
+
 
 <style>
 html, body, #app {
