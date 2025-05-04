@@ -50,14 +50,6 @@
           </div>
 
           <div class="form-group mb-3">
-            <input type="text" id="region" v-model="region" class="form-control" placeholder="Region" required>
-          </div>
-
-          <div class="form-group mb-3">
-            <input type="text" id="region" v-model="region" class="form-control" placeholder="Region" required>
-          </div>
-
-          <div class="form-group mb-3">
             <input type="text" id="contact" v-model="contact" class="form-control" placeholder="Contact No." required>
           </div>
 
@@ -72,7 +64,10 @@
             </select>
           </div>
 
-          <button type="submit" class="btn btn-success">Place Order</button>
+          <div class="d-flex gap-2">
+            <button type="submit" class="btn btn-success">Place Order</button>
+            <router-link to="/customer" class="btn btn-secondary">Cancel</router-link>
+          </div>
         </form>
       </div>
 

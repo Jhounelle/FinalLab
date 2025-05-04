@@ -4,17 +4,17 @@
     <nav class="navbar navbar-expand-lg custom-navbar fixed-top">
       <div class="container-fluid">
 
-        <router-link class="navbar-brand d-none d-lg-block" to="/">
+        <router-link class="navbar-brand d-none d-lg-block" to="/customer">
           <img src="@/assets/logo.png" alt="Scentora Logo" />
         </router-link>
 
         <div class="navbar-logo-wrapper mx-auto d-lg-none">
-          <router-link class="navbar-brand m-0" to="/">
+          <router-link class="navbar-brand m-0" to="/customer">
             <img src="@/assets/logo.png" alt="Scentora Logo" />
           </router-link>
         </div>
 
-        <button
+        <!-- <button
           class="navbar-toggler"
           type="button" 
           data-bs-toggle="offcanvas"
@@ -24,27 +24,17 @@
           aria-label="Toggle navigation"
         >
           <span class="navbar-toggler-icon"></span>
-        </button>
+        </button> -->
 
-
-        <!-- Mobile-only avatar and cart -->
+        <!-- Mobile-only logout button -->
         <div class="d-lg-none d-flex align-items-center ms-auto">
           <router-link v-if="!isAuthenticated" class="nav-link text-white me-2" to="/login">
             <i class="fa-regular fa-user"></i>
           </router-link>
 
-          <a
-            class="nav-link text-white position-relative"
-            data-bs-toggle="offcanvas"
-            href="#offcanvasCart"
-            role="button"
-            aria-controls="offcanvasCart"
-          >
-            <i class="fa-solid fa-cart-shopping"></i>
-            <span class="cart-badge badge bg-primary position-absolute">
-              {{ cartItemCount }}
-            </span>
-          </a>
+          <button class="nav-link btn btn-link text-white" @click="logout">
+            Logout
+          </button>
         </div>
 
         <div class="collapse navbar-collapse" id="navbarNav">
@@ -53,23 +43,6 @@
               <router-link class="nav-link" to="/login">
                 <i class="fa-regular fa-user"></i>
               </router-link>
-            </li>
-
-            <li class="nav-item position-relative">
-              <a
-                class="nav-link"
-                data-bs-toggle="offcanvas"
-                href="#offcanvasCart"
-                role="button"
-                aria-controls="offcanvasCart"
-              >
-                <div class="cart-icon-wrapper position-relative d-inline-block">
-                  <i class="fa-solid fa-cart-shopping"></i>
-                  <span class="cart-badge badge bg-primary position-absolute">
-                    {{ cartItemCount }}
-                  </span>
-                </div>
-              </a>
             </li>
 
             <li v-if="isAdmin" class="nav-item">
@@ -83,27 +56,6 @@
         </div>
       </div>
     </nav>
-
-    <!-- OFFCANVAS CART -->
-    <div
-      class="offcanvas offcanvas-end"
-      tabindex="-1"
-      id="offcanvasCart"
-      aria-labelledby="offcanvasCartLabel"
-    >
-      <div class="offcanvas-header">
-        <h5 id="offcanvasCartLabel">Cart</h5>
-        <button
-          type="button"
-          class="btn-close text-reset"
-          data-bs-dismiss="offcanvas"
-          aria-label="Close"
-        ></button>
-      </div>
-      <div class="offcanvas-body">
-        <CartForm />
-      </div>
-    </div>
 
     <!-- OFFCANVAS LEFTCART -->
     <div
@@ -129,19 +81,14 @@
 </template>
 
 <script>
-import CartForm from './CartForm.vue';
 import MobileSidebar from './MobileSidebar.vue';
 
 export default {
   name: 'MainNavbar',
   components: {
-    CartForm,
     MobileSidebar,
   },
   computed: {
-    cartItemCount() {
-      return this.$store.getters.cartItemCount;
-    },
     isAuthenticated() {
       return this.$store.getters.isAuthenticated;
     },
@@ -195,21 +142,18 @@ export default {
   transform: translateX(-50%);
 }
 
-.cart-icon-wrapper {
-  font-size: 16px;
+/* Remove cart icon and badge styling */
+.cart-icon-wrapper,
+.cart-badge {
+  display: none;
 }
 
-.cart-badge {
-  top: -8px;
-  right: -10px;
-  border-radius: 50%;
-  padding: 4px 6px;
-  font-size: 10px;
-  min-width: 18px;
-  height: 18px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+/* Adjust the logout button in mobile view */
+.d-lg-none .nav-link.btn-link {
+  color: white;
+  font-weight: 400;
+  padding: 0;
+  font-size: 16px;
 }
 
 </style>

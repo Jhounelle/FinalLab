@@ -1,21 +1,22 @@
 import { createRouter, createWebHistory } from 'vue-router';
 
-import HomePage from '../views/HomePage.vue';
+import CustomerPage from '../views/CustomerPage.vue';
 import CheckoutPage from '@/views/CheckoutPage.vue';
 import UserRegistration from '../views/UserRegistration.vue';
 import LoginPage from '@/views/LoginPage.vue';
-import AdminPanel from '@/views/AdminPanel.vue';
+import AdminProductPanel from '@/views/AdminProductPanel.vue';
+import AdminTransactionPanel from '@/views/AdminTransactionPanel.vue';
 
 const routes = [
   {
     path: '/',
-    name: 'home',
-    component: HomePage
-  },
-  {
-    path: '/login',
     name: 'Login',
     component: LoginPage
+  },
+  {
+    path: '/customer',
+    name: 'Customer',
+    component: CustomerPage
   },
   {
     path: '/register',
@@ -33,9 +34,19 @@ const routes = [
     component: UserRegistration
   },
   {
-    path: '/admin',
-    name: 'AdminPanel',
-    component: AdminPanel
+    path: '/admin/product',
+    name: 'AdminProductPanel',
+    component: AdminProductPanel
+  },
+  {
+    path: '/admin/product',
+    name: 'AdminProductPanel',
+    component: AdminProductPanel
+  },
+  {
+    path: '/admin/transaction',
+    name: 'AdminTransactionPanel',
+    component: AdminTransactionPanel
   },
   {
     path: '/product/:id',

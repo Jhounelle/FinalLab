@@ -19,19 +19,14 @@
               <div class="card-body">
                 <h5 class="card-title">{{ product.name }}</h5>
                 <p class="card-text">₱{{ product.price }}</p>
-                <label>Size:</label>
-                <div> 
-                    <button>30mL</button>
-                    <button>50mL</button> 
-                    <button>100mL</button>  
-                </div>
+                <p class="card-text">Stocks:  {{ product.stock }}</p>
 
                 <div class="d-flex align-items-center">
                     <!-- Number Input -->
                     <input type="number" v-model="quantity" class="form-control" placeholder="1" />
                 </div>
 
-                <p class="card-text text-muted">{{ product.description }}</p>
+                <p class="card-text text-muted">Description: {{ product.description }}</p>
                 <button
                 class="btn btn-black w-100"
                 @click="handleAddToCart(product)"

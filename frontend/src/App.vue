@@ -9,21 +9,32 @@
 </template>
 
 <script>
-import MainNavbar from './components/MainNavbar.vue';
+import AdminNavbar from './components/AdminNavbar.vue';
+import CustomerNavBar from './components/CustomerNavBar.vue';
 import CheckoutNavbar from './components/CheckoutNavbar.vue'; 
+import LoginRegisterNavbar from './components/LoginRegisterNavbar.vue'; 
 import FooterComponent from './components/FooterComponent.vue';
 
 export default {
   name: 'App',
   components: {
-    MainNavbar,
+    AdminNavbar,
+    CustomerNavBar,
     CheckoutNavbar,
+    LoginRegisterNavbar,
     FooterComponent,
   },
   computed: {
     currentNavbar() {
-      // Check if current route is '/checkout' or anything related
-      return this.$route.path.includes('/checkout') ? 'CheckoutNavbar' : 'MainNavbar';
+      const path = this.$route.path;
+
+      if (path === '/' || path === '/register') {
+        return 'LoginRegisterNavbar';
+      } else if (path === '/admin/product' || path ==='/admin/transaction') {
+        return 'AdminNavbar';
+      } else {
+        return 'CustomerNavBar';
+      }
     }
   }
 };

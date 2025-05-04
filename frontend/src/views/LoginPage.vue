@@ -1,9 +1,25 @@
 <template>
-  <div class="container mt-5" style="max-width: 500px">
-    <div class="card">
+  <div class="login-container d-flex justify-content-center align-items-center">
+    <div class="login-card card shadow">
+      <div class="card-header d-flex justify-content-around">
+        <button
+          class="tab-button"
+          :class="{ active: role === 'customer' }"
+          @click="role = 'customer'"
+        >
+          Customer
+        </button>
+        <button
+          class="tab-button"
+          :class="{ active: role === 'admin' }"
+          @click="role = 'admin'"
+        >
+          Admin
+        </button>
+      </div>
       <div class="card-body">
-        <h3 class="card-title text-center mb-4">LOGIN</h3>
-        <div class="textLabel">Enter your email and password to login:</div>
+        <h4 class="text-center mb-4">{{ role.toUpperCase() }} LOGIN</h4>
+
         <form @submit.prevent="handleLogin">
           <div class="mb-3">
             <input
@@ -25,7 +41,8 @@
           </div>
           <button type="submit" class="btn btn-primary w-100">Login</button>
         </form>
-        <p class="mt-3 text-center">
+
+        <p v-if="role === 'customer'" class="mt-3 text-center">
           Don't have an account?
           <router-link to="/register">Register here</router-link>
         </p>
@@ -41,7 +58,8 @@ export default {
   data() {
     return {
       email: '',
-      password: ''
+      password: '',
+      role: 'customer' // Default tab
     };
   },
   methods: {
@@ -49,8 +67,15 @@ export default {
     handleLogin() {
       if (this.email && this.password) {
         this.SET_AUTH(true);
-        alert('Login successful!');
-        this.$router.push('/');
+        this.$store.commit('SET_ROLE', this.role);
+
+        alert(`${this.role.toUpperCase()} login successful!`);
+
+        if (this.role === 'admin') {
+          this.$router.push('/admin/product'); // ✅ go to admin product page
+        } else {
+          this.$router.push('/customer'); // ✅ go to customer page
+        }
       } else {
         alert('Invalid credentials.');
       }
@@ -60,41 +85,48 @@ export default {
 </script>
 
 <style scoped>
-.container {
-  background-color: #D9D9D9;
-  padding: 4rem 0rem;
+.login-container {
+  background-color: #d9d9d9;
   border-radius: 12px;
+  padding-top: 8%; /* Pushes it downward */
 }
 
-.card {
+.login-card {
+  width: 100%;
+  max-width: 400px;
+  border-radius: 12px;
+  overflow: hidden;
+  
+}
+
+.card-header {
+  background-color: #29000a;
+  padding: 0;
+}
+
+.tab-button {
+  width: 50%;
+  padding: 1rem;
   border: none;
-  border-radius: 16px;
-  background-color: #D9D9D9;
-  box-shadow: none;
+  background-color: #29000a;
+  color: white;
+  font-weight: 600;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+.tab-button.active {
+  background-color: #a26d5c;
+}
+
+.tab-button:not(.active):hover {
+  background-color: #47201d;
 }
 
 .card-body {
+  background-color: #ffffff;
   padding: 2rem;
-}
-
-.card-title {
-  font-weight: 700;
-  color: #121212;
-  font-size: 1.75rem;
-  font-family: Poppins, 'sans-serif';
-}
-
-label {
-  font-weight: 500;
-  margin-bottom: 5px;
-  color: #121212;
-}
-
-.textLabel {
-  font-size: 0.8rem;
-  color: #121212;
-  text-align: center;
-  margin-bottom: 30px;
 }
 
 input.form-control {
@@ -105,12 +137,12 @@ input.form-control {
 }
 
 input.form-control:focus {
-  border-color: #D9AD9A;
-  box-shadow: 0 0 0 0.15rem #A26D5C;
+  border-color: #d9ad9a;
+  box-shadow: 0 0 0 0.15rem #a26d5c;
 }
 
 .btn-primary {
-  background-color: #29000A;
+  background-color: #29000a;
   border: none;
   font-weight: 600;
   padding: 10px 16px;
@@ -119,18 +151,18 @@ input.form-control:focus {
 }
 
 .btn-primary:hover {
-  background-color:rgb(255, 255, 255);
-  border: 1px solid #29000A;
-  color: #29000A;
+  background-color: #ffffff;
+  border: 1px solid #29000a;
+  color: #29000a;
 }
 
 p {
-  color:rgb(0, 0, 0);
+  color: #000;
   font-size: 14px;
 }
 
 a {
-  color:rgb(207, 59, 0);
+  color: #cf3b00;
   text-decoration: none;
   font-weight: 500;
 }

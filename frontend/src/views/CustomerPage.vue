@@ -64,11 +64,67 @@
     </div>
 
     <div class="mt-5 text-end">
-      <router-link to="/cart" class="btn btn-outline-primary">
+      <button
+        class="btn btn-outline-primary"
+        data-bs-toggle="modal"
+        data-bs-target="#cartModal"
+      >
         View Cart ({{ cartItemCount }} items)
-      </router-link>
+      </button>
     </div>
   </div>
+
+  <!-- Cart Confirmation Modal -->
+<div class="modal fade" id="cartModal" tabindex="-1" aria-labelledby="cartModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-lg modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="cartModalLabel">Confirm Your Order</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+
+      <div class="modal-body">
+        <div v-if="cart.length">
+          <table class="table table-hover align-middle">
+            <thead class="table-light">
+              <tr>
+                <th scope="col">Product</th>
+                <th scope="col">Price</th>
+                <th scope="col">Quantity</th>
+                <th scope="col">Subtotal</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr v-for="item in cart" :key="item.id">
+                <td>{{ item.name }}</td>
+                <td>₱{{ item.price }}</td>
+                <td>{{ item.quantity }}</td>
+                <td>₱{{ item.price * item.quantity }}</td>
+              </tr>
+            </tbody>
+            <tfoot>
+              <tr class="table-light">
+                <td colspan="3" class="text-end fw-bold">Total</td>
+                <td class="fw-bold">₱{{ totalAmount }}</td>
+              </tr>
+            </tfoot>
+          </table>
+        </div>
+        <div v-else class="text-center">
+          <p class="text-muted">Your cart is empty.</p>
+        </div>
+      </div>
+
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+        <button type="button" class="btn btn-primary" @click="proceedToCheckout" :disabled="!cart.length">
+          Confirm Order
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
 </template>
 
 <script>
@@ -81,7 +137,7 @@ export default {
     };
   },
   computed: {
-    ...mapState(['products']),
+    ...mapState(['products', 'cart']),
     ...mapGetters(['cartItemCount', 'isAuthenticated']),
 
     filteredProducts() {
@@ -89,6 +145,10 @@ export default {
       return this.products.filter(product =>
         product.name.toLowerCase().includes(this.searchQuery.toLowerCase())
       );
+    },
+
+    totalAmount() {
+      return this.cart.reduce((sum, item) => sum + item.price * item.quantity, 0);
     }
   },
   methods: {
@@ -96,15 +156,20 @@ export default {
 
     handleAddToCart(product) {
       if (this.isAuthenticated) {
-        this.addToCart(product); 
+        this.addToCart(product);
       } else {
-        alert('You must register before adding items to cart.'); 
-        this.$router.push('/register'); 
+        alert('You must register before adding items to cart.');
+        this.$router.push('/register');
       }
     },
 
     getImageUrl(filename) {
       return require(`@/assets/${filename}`);
+    },
+
+    proceedToCheckout() {
+      alert('Order confirmed! Proceeding to checkout...');
+      this.$router.push('/checkout'); // or whatever page you want
     }
   },
   mounted() {

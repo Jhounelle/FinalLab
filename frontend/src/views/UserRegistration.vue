@@ -63,7 +63,7 @@
         </form>
         <p class="mt-3 text-center">
           Already have an account?
-          <router-link to="/login">Login here</router-link>
+          <router-link to="/">Login here</router-link>
         </p>
       </div>
     </div>
