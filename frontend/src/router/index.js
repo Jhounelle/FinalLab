@@ -10,13 +10,13 @@ import AdminTransactionPanel from '@/views/AdminTransactionPanel.vue';
 const routes = [
   {
     path: '/',
-    name: 'Login',
-    component: LoginPage
-  },
-  {
-    path: '/customer',
     name: 'Customer',
     component: CustomerPage
+  },
+  {
+    path: '/login',
+    name: 'login',
+    component: LoginPage
   },
   {
     path: '/register',
@@ -38,11 +38,7 @@ const routes = [
     name: 'AdminProductPanel',
     component: AdminProductPanel
   },
-  {
-    path: '/admin/product',
-    name: 'AdminProductPanel',
-    component: AdminProductPanel
-  },
+
   {
     path: '/admin/transaction',
     name: 'AdminTransactionPanel',

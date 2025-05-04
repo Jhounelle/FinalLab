@@ -4,7 +4,7 @@
     <nav class="navbar navbar-expand-lg custom-navbar fixed-top">
       <div class="container-fluid">
 
-        <router-link class="navbar-brand d-none d-lg-block" to="/customer">
+        <router-link class="navbar-brand d-none d-lg-block" to="/">
           <img src="@/assets/logo.png" alt="Scentora Logo" />
         </router-link>
 
@@ -29,7 +29,7 @@
         <!-- Mobile-only logout button -->
         <div class="d-lg-none d-flex align-items-center ms-auto">
           <router-link v-if="!isAuthenticated" class="nav-link text-white me-2" to="/login">
-            <i class="fa-regular fa-user"></i>
+            Logout<i class="fa-regular fa-user"></i>
           </router-link>
 
           <button class="nav-link btn btn-link text-white" @click="logout">

@@ -14,6 +14,14 @@
           </router-link>
         </div>
 
+          <ul class="navbar-nav ms-auto">
+            <li v-if="!isAuthenticated" class="nav-item">
+              <router-link class="nav-link" to="/login">
+                <i class="fa-regular fa-user"></i>
+              </router-link>
+            </li>
+          </ul>
+
         <!-- <button
           class="navbar-toggler"
           type="button" 
