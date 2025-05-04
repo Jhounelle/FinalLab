@@ -138,6 +138,8 @@ export default {
 
   .total {
     font-weight: bold;
-    margin-top: 20px;
+    margin-top: 25px;
   }
+
+
 </style>
