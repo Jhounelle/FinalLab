@@ -31,14 +31,14 @@ class UserRegistrationView(APIView):
                 status=status.HTTP_400_BAD_REQUEST
             )
             
-        # Check if user already exists
+        
         if User.objects.filter(email=email).exists():
             return Response(
                 {'error': 'User with this email already exists'}, 
                 status=status.HTTP_400_BAD_REQUEST
             )
             
-        # Create the user
+        
         user = User.objects.create_user(
             username=email,
             email=email,
@@ -47,14 +47,14 @@ class UserRegistrationView(APIView):
             last_name=last_name
         )
         
-        # Create user profile
+        
         profile = UserProfile.objects.create(
             user=user,
-            is_customer=True,  # Default to customer role
+            is_customer=True,  
             location=location
         )
         
-        # Create token for the user
+        
         token, _ = Token.objects.get_or_create(user=user)
         
         return Response({
@@ -81,7 +81,7 @@ class CustomAuthToken(ObtainAuthToken):
 
         token, created = Token.objects.get_or_create(user=user)
         
-        # Add role information to the response
+        
         role = 'admin' if user.is_staff else 'customer'
         
         return Response({
@@ -89,7 +89,7 @@ class CustomAuthToken(ObtainAuthToken):
             'role': role
         })
     
-# Employee full-access viewset
+
 class EmployeeProductViewSet(viewsets.ModelViewSet):
     queryset = Product.objects.all()
     serializer_class = ProductSerializer
@@ -97,12 +97,11 @@ class EmployeeProductViewSet(viewsets.ModelViewSet):
     permission_classes = [IsAuthenticated, IsEmployee]
     
     def create(self, request, *args, **kwargs):
-        # Enhanced debugging
         print("\n----- DEBUG: PRODUCT CREATION -----")
         print("Request data type:", type(request.data))
         print("Request data:", request.data)
         
-        # Try converting price and stock explicitly if needed
+        
         try:
             data = request.data.copy()
             if 'price' in data and not isinstance(data['price'], (int, float)):
@@ -137,30 +136,30 @@ class EmployeeProductViewSet(viewsets.ModelViewSet):
         """Override delete to prevent deletion of products in orders"""
         product = self.get_object()
         
-        # Check if product is in any orders
+        
         if OrderItem.objects.filter(product=product).exists():
             return Response(
                 {"detail": "This product cannot be deleted because it has been ordered by customers."},
                 status=status.HTTP_400_BAD_REQUEST
             )
             
-        # If not in orders, proceed with deletion
+      
         return super().destroy(request, *args, **kwargs)
 
-# Customer limited-access viewset (read-only)
+
 class CustomerProductViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = Product.objects.all()
     serializer_class = ProductSerializer
     authentication_classes = [TokenAuthentication]
     permission_classes = [IsAuthenticated, IsCustomerReadOnly]
 
-# Public product viewset (read-only, no authentication)
+
 class PublicProductViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = Product.objects.all()
     serializer_class = ProductSerializer
     permission_classes = [AllowAny]
 
-# Order viewsets
+
 class AdminOrderViewSet(viewsets.ModelViewSet):
     queryset = Order.objects.all().order_by('-created_at')
     serializer_class = OrderSerializer
@@ -177,14 +176,13 @@ class CustomerOrderViewSet(viewsets.ModelViewSet):
     
     @transaction.atomic
     def create(self, request, *args, **kwargs):
-        # Add some debugging
         print("\n----- DEBUG: ORDER CREATION -----")
         print("Request data:", request.data)
         
-        # Make a mutable copy of request data
+        
         data = request.data.copy()
         
-        # Ensure we have the required fields
+        
         required_fields = ['full_name', 'email', 'address', 'phone', 'total_amount']
         for field in required_fields:
             if field not in data:
@@ -193,7 +191,7 @@ class CustomerOrderViewSet(viewsets.ModelViewSet):
                     status=status.HTTP_400_BAD_REQUEST
                 )
                 
-        # Ensure we have order items
+        
         if 'order_items' not in data or not data['order_items']:
             return Response(
                 {'order_items': ["At least one order item is required."]},
@@ -201,16 +199,13 @@ class CustomerOrderViewSet(viewsets.ModelViewSet):
             )
             
         try:
-            # Validate order items without modifying the structure
             for item_data in data['order_items']:
-                # Check required fields
                 if not all(k in item_data for k in ['product', 'quantity', 'price']):
                     return Response(
                         {'order_items': ["Each order item must have product, quantity, and price."]},
                         status=status.HTTP_400_BAD_REQUEST
                     )
                 
-                # Verify product exists
                 try:
                     product_id = int(item_data['product'])
                     product = Product.objects.get(id=product_id)
@@ -225,7 +220,6 @@ class CustomerOrderViewSet(viewsets.ModelViewSet):
                         status=status.HTTP_400_BAD_REQUEST
                     )
                 
-                # Validate quantity
                 try:
                     quantity = int(item_data['quantity'])
                     if quantity <= 0:
@@ -239,14 +233,12 @@ class CustomerOrderViewSet(viewsets.ModelViewSet):
                         status=status.HTTP_400_BAD_REQUEST
                     )
                 
-                # Check stock availability
                 if product.stock < quantity:
                     return Response(
                         {'non_field_errors': [f"Product '{product.name}' has insufficient stock. Available: {product.stock}, requested: {quantity}"]},
                         status=status.HTTP_400_BAD_REQUEST
                     )
                 
-                # Validate price
                 try:
                     price = float(item_data['price'])
                     if price <= 0:
@@ -260,7 +252,6 @@ class CustomerOrderViewSet(viewsets.ModelViewSet):
                         status=status.HTTP_400_BAD_REQUEST
                     )
             
-            # Create the order with just the order data (without items)
             order_data = {
                 'full_name': data['full_name'],
                 'email': data['email'],
@@ -270,24 +261,20 @@ class CustomerOrderViewSet(viewsets.ModelViewSet):
                 'status': 'pending'
             }
             
-            # Create the order
             order = Order.objects.create(
                 user=request.user,
                 **order_data
             )
             
-            # Create order items manually
             for item_data in data['order_items']:
                 product_id = int(item_data['product'])
                 product = Product.objects.get(id=product_id)
                 quantity = int(item_data['quantity'])
                 price = float(item_data['price'])
                 
-                # Update product stock
                 product.stock -= quantity
                 product.save()
                 
-                # Create order item
                 OrderItem.objects.create(
                     order=order,
                     product=product,
@@ -295,7 +282,6 @@ class CustomerOrderViewSet(viewsets.ModelViewSet):
                     price=price
                 )
             
-            # Return the created order
             serializer = self.get_serializer(order)
             return Response(
                 serializer.data, 

@@ -12,7 +12,6 @@ class ProductSerializer(serializers.ModelSerializer):
         Validate that price is positive
         """
         try:
-            # Convert to float in case we got a string
             if isinstance(value, str):
                 value = float(value)
         except (ValueError, TypeError):
@@ -27,7 +26,6 @@ class ProductSerializer(serializers.ModelSerializer):
         Validate that stock is non-negative
         """
         try:
-            # Convert to int in case we got a string
             if isinstance(value, str):
                 value = int(value)
         except (ValueError, TypeError):
@@ -62,7 +60,6 @@ class OrderSerializer(serializers.ModelSerializer):
     items = OrderItemSerializer(many=True, read_only=True)
     status_display = serializers.SerializerMethodField()
     
-    # Fields for creating order items when creating the order
     order_items = OrderItemCreateSerializer(many=True, write_only=True, required=False)
     
     class Meta:
@@ -79,28 +76,22 @@ class OrderSerializer(serializers.ModelSerializer):
     
     @transaction.atomic
     def create(self, validated_data):
-        # Extract order items data
         order_items_data = validated_data.pop('order_items', [])
         
-        # Create the order
         order = Order.objects.create(**validated_data)
         
-        # Process each order item
         for item_data in order_items_data:
             product = item_data['product']
             quantity = item_data['quantity']
             
-            # Check stock
             if product.stock < quantity:
                 raise serializers.ValidationError(
                     f"Product '{product.name}' has insufficient stock. Available: {product.stock}, requested: {quantity}"
                 )
             
-            # Reduce product stock
             product.stock -= quantity
             product.save()
             
-            # Create order item
             OrderItem.objects.create(
                 order=order,
                 product=product,
