@@ -40,7 +40,7 @@ export default createStore({
           name: 'Noir Drift',
           price: 599,
           image: 'noir-drift.jpg',
-          description: 'tung tung tung sahur',
+          description: 'A captivating fragrance that evokes mystery, elegance, and quiet strength. ',
           stock: 25
         },
         {

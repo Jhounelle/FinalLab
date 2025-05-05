@@ -18,7 +18,7 @@
         </button>
       </div>
       <div class="card-body">
-        <h4 class="text-center mb-4">{{ role.toUpperCase() }} LOGIN</h4>
+        <h4 class="text-center mt-4 mb-4">{{ role.toUpperCase() }} LOGIN</h4>
 
         <form @submit.prevent="handleLogin">
           <div class="mb-3">
@@ -45,6 +45,9 @@
         <p v-if="role === 'customer'" class="mt-3 text-center">
           Don't have an account?
           <router-link to="/register">Register here</router-link>
+        </p>
+        <p v-if="role === 'admin'" class="mt-3 text-center">
+          <span style="color: red; font-weight: 600">Notice:</span> For authorized personnel only.
         </p>
       </div>
     </div>
@@ -86,9 +89,9 @@ export default {
 
 <style scoped>
 .login-container {
-  background-color: #d9d9d9;
+  display: flex;
   border-radius: 12px;
-  padding-top: 8%; /* Pushes it downward */
+  height:100%;
 }
 
 .login-card {
@@ -96,7 +99,6 @@ export default {
   max-width: 400px;
   border-radius: 12px;
   overflow: hidden;
-  
 }
 
 .card-header {
@@ -125,8 +127,7 @@ export default {
 }
 
 .card-body {
-  background-color: #ffffff;
-  padding: 2rem;
+  background-color:rgb(255, 255, 255);
 }
 
 input.form-control {

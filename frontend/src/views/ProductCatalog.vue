@@ -15,25 +15,31 @@
 
           <!-- Product Info on the right -->
           <div class="col-md-6">
-            <div class="card h-100 shadow-sm">
+            <div class="card h-100">
               <div class="card-body">
                 <h5 class="card-title">{{ product.name }}</h5>
                 <p class="card-text">₱{{ product.price }}</p>
-                <p class="card-text">Stocks:  {{ product.stock }}</p>
-
-                <div class="d-flex align-items-center">
+                <p class="card-text pt-0 pb-4">Stocks:  {{ product.stock }}</p>
+                <p class="text">Sizes:</p>
+                <div class="d-flex gap-3 pb-4"> 
+                  <button class="btn-custom">30mL</button> 
+                  <button class="btn-custom">50mL</button> 
+                  <button class="btn-custom">100mL</button> 
+                </div>
+                <div class="align-items-center pb-5">
                     <!-- Number Input -->
-                    <input type="number" v-model="quantity" class="form-control" placeholder="1" />
+                    <p class="text">QTY:</p>
+                    <input type="number" v-model="quantity" class="form-control" placeholder="1" style="width: ;"/>
                 </div>
 
                 <p class="card-text text-muted">Description: {{ product.description }}</p>
+              </div>
                 <button
-                class="btn btn-black w-100"
+                class="btn btn-black w-100 bottom-fixed"
                 @click="handleAddToCart(product)"
                 >
                 Add to Cart
                 </button>
-              </div>
             </div>
           </div>
         </div>
@@ -118,4 +124,26 @@ export default {
 .card-title{
     font-size: 38px;
 }
+
+.card {
+  border: none;
+}
+
+.btn-custom {
+  background-color: #f8f9fa;      
+  color: #333;                   
+  border: 1px solid #ccc;       
+  border-radius: 8px;
+  font-weight: 500;
+  font-size: 16px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.btn-custom:hover {
+  background-color: #e2e6ea;      
+  border-color: #bbb;
+  color: #000;
+}
+
 </style>
