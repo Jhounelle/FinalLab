@@ -41,23 +41,27 @@
         v-for="product in filteredProducts"
         :key="product.id"
       >
-        <div class="card h-100 shadow-sm">
-            <img :src="getImageUrl(product.image)" class="card-img-top" alt="Product image" />
-            <div class="card-body">
+        <div class="card h-100 product-card shadow-sm">
+          <div class="product-image-container">
+            <img :src="getImageUrl(product.image)" class="card-img-top product-image" alt="Product image" />
+          </div>
+          <div class="card-body d-flex flex-column">
             <h5 class="card-title">{{ product.name }}</h5>
             <p class="card-text">₱{{ product.price }}</p>
-            <button
-              class="btn btn-black w-100 mb-1"
-              @click="$router.push(`/product/${product.id}`)"
-            >
-              View Product
-            </button>
-            <button
-              class="btn btn-black w-100"
-              @click="handleAddToCart(product)"
-            >
-              Add to Cart
-            </button>
+            <div class="mt-auto">
+              <button
+                class="btn btn-black w-100 mb-2"
+                @click="$router.push(`/product/${product.id}`)"
+              >
+                View Product
+              </button>
+              <button
+                class="btn btn-black w-100"
+                @click="handleAddToCart(product)"
+              >
+                Add to Cart
+              </button>
+            </div>
           </div>
         </div>
       </div>
@@ -66,74 +70,39 @@
     <div class="mt-5 text-end">
       <button
         class="btn btn-outline-primary"
-        data-bs-toggle="modal"
-        data-bs-target="#cartModal"
+        @click="goToCart"
       >
-        View Cart ({{ cartItemCount }} items)
+        <i class="fa-solid fa-cart-shopping me-2"></i>View Cart ({{ cartItemCount }} items)
       </button>
     </div>
   </div>
 
-  <!-- Cart Confirmation Modal -->
-<div class="modal fade" id="cartModal" tabindex="-1" aria-labelledby="cartModalLabel" aria-hidden="true">
-  <div class="modal-dialog modal-lg modal-dialog-centered">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title" id="cartModalLabel">Confirm Your Order</h5>
-        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+  <!-- Toast Notification -->
+  <div class="toast-container position-fixed bottom-0 end-0 p-3">
+    <div id="cartToast" class="toast" role="alert" aria-live="assertive" aria-atomic="true">
+      <div class="toast-header">
+        <strong class="me-auto">Scentora</strong>
+        <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
       </div>
-
-      <div class="modal-body">
-        <div v-if="cart.length">
-          <table class="table table-hover align-middle">
-            <thead class="table-light">
-              <tr>
-                <th scope="col">Product</th>
-                <th scope="col">Price</th>
-                <th scope="col">Quantity</th>
-                <th scope="col">Subtotal</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr v-for="item in cart" :key="item.id">
-                <td>{{ item.name }}</td>
-                <td>₱{{ item.price }}</td>
-                <td>{{ item.quantity }}</td>
-                <td>₱{{ item.price * item.quantity }}</td>
-              </tr>
-            </tbody>
-            <tfoot>
-              <tr class="table-light">
-                <td colspan="3" class="text-end fw-bold">Total</td>
-                <td class="fw-bold">₱{{ totalAmount }}</td>
-              </tr>
-            </tfoot>
-          </table>
-        </div>
-        <div v-else class="text-center">
-          <p class="text-muted">Your cart is empty.</p>
-        </div>
-      </div>
-
-      <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-        <button type="button" class="btn btn-primary" @click="proceedToCheckout" :disabled="!cart.length">
-          Confirm Order
-        </button>
+      <div class="toast-body">
+        {{ toastMessage }}
       </div>
     </div>
   </div>
-</div>
 
 </template>
 
 <script>
 import { mapState, mapGetters, mapActions } from 'vuex';
+import bootstrap from 'bootstrap/dist/js/bootstrap.bundle.min.js';
+import { getImageUrl } from '../utils/imageHelper';
 
 export default {
   data() {
     return {
-      searchQuery: '', 
+      searchQuery: '',
+      toastMessage: '',
+      cartToast: null
     };
   },
   computed: {
@@ -154,28 +123,49 @@ export default {
   methods: {
     ...mapActions(['addToCart']),
 
-    handleAddToCart(product) {
+    async handleAddToCart(product) {
       if (this.isAuthenticated) {
-        this.addToCart(product);
+        try {
+          // Dispatch returns a Promise
+          const result = await this.addToCart(product);
+          
+          if (!result.success) {
+            this.showToast(result.message || 'Could not add product to cart.');
+          } else {
+            this.showToast(`${product.name} added to your cart!`);
+          }
+        } catch (error) {
+          console.error('Error adding to cart:', error);
+          this.showToast('An error occurred adding the product to cart.');
+        }
       } else {
-        alert('You must register before adding items to cart.');
-        this.$router.push('/register');
+        this.showToast('You must register before adding items to cart.');
+        setTimeout(() => {
+          this.$router.push('/register');
+        }, 1500);
       }
     },
 
-    getImageUrl(filename) {
-      return require(`@/assets/${filename}`);
+    showToast(message) {
+      this.toastMessage = message;
+      if (this.cartToast) {
+        this.cartToast.show();
+      }
     },
 
-    proceedToCheckout() {
-      alert('Order confirmed! Proceeding to checkout...');
-      this.$router.push('/checkout'); // or whatever page you want
+    getImageUrl,
+
+    goToCart() {
+      this.$router.push('/cart');
     }
   },
   mounted() {
     if (!this.products.length) {
       this.$store.dispatch('fetchProducts');
     }
+    
+    // Initialize toast
+    this.cartToast = new bootstrap.Toast(document.getElementById('cartToast'));
   }
 };
 </script>
@@ -197,37 +187,57 @@ h2 {
   border-radius: 12px;
   background-color: #ffffff;
   transition: box-shadow 0.3s ease;
+  height: 100%;
 }
 
 .card:hover {
   box-shadow: 0 6px 18px rgba(0, 0, 0, 0.1);
+  transform: translateY(-5px);
 }
 
-.card-img-top {
+.product-card {
+  display: flex;
+  flex-direction: column;
+}
+
+.product-image-container {
+  height: 280px;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 15px;
+}
+
+.card-img-top.product-image {
+  max-height: 100%;
+  max-width: 100%;
+  object-fit: contain;
   border-top-left-radius: 12px;
   border-top-right-radius: 12px;
-  max-height: 750px;
-  object-fit: cover;
 }
 
 .card-title {
   font-weight: 600;
   color: #121212;
   font-size: 1.2rem;
+  height: 50px;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .card-text {
   color: #333;
-  font-size: 0.95rem;
-}
-
-.card-text.text-muted {
-  color: #777;
-  font-size: 0.85rem;
+  font-size: 1.2rem;
+  font-weight: 500;
 }
 
 .card-body {
   text-align: center;
+  padding: 1.5rem;
 }
 
 .mt-5 {

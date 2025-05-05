@@ -26,25 +26,38 @@
           <span class="navbar-toggler-icon"></span>
         </button> -->
 
-        <!-- Mobile-only logout button -->
+        <!-- Mobile-only buttons -->
         <div class="d-lg-none d-flex align-items-center ms-auto">
-          <router-link v-if="!isAuthenticated" class="nav-link text-white me-2" to="/login">
-            Logout<i class="fa-regular fa-user"></i>
+          <!-- Cart button for mobile -->
+          <router-link class="nav-link text-white me-3 position-relative" to="/cart">
+            <i class="fa-solid fa-cart-shopping fs-5"></i>
+            <span v-if="cartItemCount > 0" class="cart-badge position-absolute">{{ cartItemCount }}</span>
           </router-link>
 
-          <button class="nav-link btn btn-link text-white" @click="logout">
+          <router-link v-if="!isAuthenticated" class="nav-link text-white me-2" to="/login">
+            <i class="bi bi-person fs-5"></i>
+          </router-link>
+
+          <button v-if="isAuthenticated" class="nav-link btn btn-link text-white" @click="logout">
             Logout
           </button>
         </div>
 
         <div class="collapse navbar-collapse" id="navbarNav">
           <ul class="navbar-nav ms-auto">
-            <li v-if="!isAuthenticated" class="nav-item">
-              <router-link class="nav-link" to="/login">
-                <i class="fa-regular fa-user"></i>
+            <!-- Cart button for desktop -->
+            <li class="nav-item">
+              <router-link class="nav-link position-relative" to="/cart">
+                <i class="fa-solid fa-cart-shopping fs-5"></i>
+                <span v-if="cartItemCount > 0" class="cart-badge position-absolute">{{ cartItemCount }}</span>
               </router-link>
             </li>
 
+            <li v-if="!isAuthenticated" class="nav-item">
+              <router-link class="nav-link" to="/login">
+                <i class="bi bi-person fs-5"></i>
+              </router-link>
+            </li>
 
             <li v-if="isAdmin" class="nav-item">
               <router-link class="nav-link" to="/admin-panel">Admin Panel</router-link>
@@ -94,8 +107,11 @@ export default {
       return this.$store.getters.isAuthenticated;
     },
     isAdmin() {
-      return this.isAuthenticated && this.$store.state.user?.role === 'admin';
+      return this.isAuthenticated && this.$store.state.userRole === 'admin';
     },
+    cartItemCount() {
+      return this.$store.getters.cartItemCount || 0;
+    }
   },
   methods: {
     logout() {
@@ -143,10 +159,15 @@ export default {
   transform: translateX(-50%);
 }
 
-/* Remove cart icon and badge styling */
-.cart-icon-wrapper,
+/* Cart badge styling */
 .cart-badge {
-  display: none;
+  background-color: #ff0000;
+  color: white;
+  font-size: 0.7rem;
+  padding: 0.2rem 0.4rem;
+  border-radius: 50%;
+  top: -5px;
+  right: -5px;
 }
 
 /* Adjust the logout button in mobile view */

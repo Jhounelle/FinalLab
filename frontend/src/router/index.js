@@ -1,4 +1,5 @@
 import { createRouter, createWebHistory } from 'vue-router';
+import store from '../store';
 
 import CustomerPage from '../views/CustomerPage.vue';
 import CheckoutPage from '@/views/CheckoutPage.vue';
@@ -14,6 +15,12 @@ const routes = [
     component: CustomerPage
   },
   {
+    path: '/customer',
+    name: 'CustomerHome',
+    component: CustomerPage,
+    meta: { requiresAuth: true, requiresCustomer: true }
+  },
+  {
     path: '/login',
     name: 'login',
     component: LoginPage
@@ -26,7 +33,8 @@ const routes = [
   {
     path: '/cart',
     name: 'cart',
-    component: () => import('@/views/UserCart.vue')
+    component: () => import('@/views/UserCart.vue'),
+    meta: { requiresAuth: true }
   },
   {
     path: '/registration',
@@ -36,13 +44,14 @@ const routes = [
   {
     path: '/admin/product',
     name: 'AdminProductPanel',
-    component: AdminProductPanel
+    component: AdminProductPanel,
+    meta: { requiresAuth: true, requiresAdmin: true }
   },
-
   {
     path: '/admin/transaction',
     name: 'AdminTransactionPanel',
-    component: AdminTransactionPanel
+    component: AdminTransactionPanel,
+    meta: { requiresAuth: true, requiresAdmin: true }
   },
   {
     path: '/product/:id',
@@ -54,13 +63,49 @@ const routes = [
     path: '/checkout',
     name: 'checkout',
     component: CheckoutPage,
-    meta: { useCheckoutNavbar: true }
+    meta: { useCheckoutNavbar: true, requiresAuth: true }
   }, 
 ];
 
 const router = createRouter({
   history: createWebHistory(process.env.BASE_URL),
   routes
+});
+
+// Navigation guards
+router.beforeEach((to, from, next) => {
+  const requiresAuth = to.matched.some(record => record.meta.requiresAuth);
+  const requiresAdmin = to.matched.some(record => record.meta.requiresAdmin);
+  const requiresCustomer = to.matched.some(record => record.meta.requiresCustomer);
+  const isAuthenticated = store.getters.isAuthenticated;
+  const isAdmin = store.getters.isAdmin;
+  const isCustomer = store.getters.isCustomer;
+
+  // If route requires authentication and user is not authenticated
+  if (requiresAuth && !isAuthenticated) {
+    next('/login');
+  } 
+  // If route requires admin role and user is not admin
+  else if (requiresAdmin && !isAdmin) {
+    // Redirect to customer home if authenticated but not admin
+    if (isAuthenticated) {
+      next('/customer');
+    } else {
+      next('/login');
+    }
+  }
+  // If route requires customer role and user is not customer
+  else if (requiresCustomer && !isCustomer) {
+    // Redirect to admin panel if authenticated but not customer
+    if (isAuthenticated && isAdmin) {
+      next('/admin/product');
+    } else {
+      next('/login');
+    }
+  }
+  else {
+    next();
+  }
 });
 
 export default router;

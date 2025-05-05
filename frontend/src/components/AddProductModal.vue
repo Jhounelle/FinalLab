@@ -9,7 +9,7 @@
             </button>
           </div>
           <div class="modal-body">
-            <form @submit.prevent="submit">
+            <form @submit.prevent="submit" enctype="multipart/form-data">
               <div class="row g-3">
                 <div class="col-md-6">
                   <input type="text" v-model="product.name" class="form-control" placeholder="Product Name" required />
@@ -23,9 +23,17 @@
                 <div class="col-md-12">
                   <input type="text" v-model="product.description" class="form-control" placeholder="Description" />
                 </div>
+                
+                <!-- Image Preview -->
+                <div v-if="imagePreview" class="col-md-12 mt-3 text-center">
+                  <p>Image Preview:</p>
+                  <img :src="imagePreview" class="img-thumbnail" style="max-height: 200px;" alt="Product image preview" />
+                </div>
+                
                 <div class="col-md-12 mt-3">
-                  <label class="form-label">Product Image</label>
-                  <input type="file" @change="handleImageUpload" class="form-control" />
+                  <label class="form-label">Product Image <span class="text-danger">*</span></label>
+                  <input type="file" @change="handleImageUpload" class="form-control" accept="image/*" required />
+                  <small class="text-muted">Image is required for all products</small>
                 </div>
               </div>
               <div class="modal-footer">
@@ -40,6 +48,8 @@
   </template>
   
   <script>
+  import { getImageUrl } from '../utils/imageHelper';
+  
   export default {
     data() {
       return {
@@ -47,28 +57,65 @@
           name: '',
           price: '',
           description: '',
-          stock: 0,
+          stock: 1,
           image: null
-        }
+        },
+        imageFile: null, // Store the actual file object
+        imagePreview: null
       };
     },
     methods: {
       submit() {
-        const id = Date.now();
-        this.$emit('add-product', { ...this.product, id });
-        this.product = { name: '', price: '', description: '', stock: 0, image: null };
+        if (!this.product.name || !this.product.price) {
+          alert('Please fill in all required fields.');
+          return;
+        }
+        
+        if (parseFloat(this.product.price) <= 0) {
+          alert('Price must be greater than zero.');
+          return;
+        }
+        
+        if (parseInt(this.product.stock) < 0) {
+          alert('Stock cannot be negative.');
+          return;
+        }
+        
+        if (!this.imageFile) {
+          alert('Please select an image for the product.');
+          return;
+        }
+        
+        const productToSend = {
+          ...this.product,
+          price: parseFloat(this.product.price),
+          stock: parseInt(this.product.stock)
+        };
+        
+        // Add the file separately so we can handle it properly
+        console.log('Preparing to send product with image file:', this.imageFile);
+        this.$emit('add-product', productToSend, this.imageFile);
+        
+        // Reset form
+        this.product = { name: '', price: '', description: '', stock: 1, image: null };
+        this.imageFile = null;
+        this.imagePreview = null;
         this.$emit('close');
       },
       handleImageUpload(event) {
         const file = event.target.files[0];
         if (file) {
+          this.imageFile = file;
+          
+          // Preview the image
           const reader = new FileReader();
-          reader.onload = () => {
-            this.product.image = reader.result;
+          reader.onload = (e) => {
+            this.imagePreview = e.target.result;
           };
           reader.readAsDataURL(file);
         }
-      }
+      },
+      getImageUrl
     }
   };
   </script>

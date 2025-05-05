@@ -9,7 +9,7 @@
             </button>
           </div>
           <div class="modal-body">
-            <form @submit.prevent="submit">
+            <form @submit.prevent="submit" enctype="multipart/form-data">
               <div class="row g-3">
                 <div class="col-md-6">
                   <input type="text" v-model="product.name" class="form-control" placeholder="Product Name" required />
@@ -23,9 +23,17 @@
                 <div class="col-md-12 mt-2">
                   <input type="text" v-model="product.description" class="form-control" placeholder="Description" />
                 </div>
+                
+                <!-- Current Image Preview -->
+                <div v-if="currentImageUrl" class="col-md-12 mt-3 text-center">
+                  <p>Current Image:</p>
+                  <img :src="currentImageUrl" class="img-thumbnail" style="max-height: 200px;" alt="Current product image" />
+                </div>
+                
                 <div class="col-md-12 mt-3">
-                  <label class="form-label">Product Image</label>
-                  <input type="file" @change="handleImageUpload" class="form-control" />
+                  <label class="form-label">Upload New Image</label>
+                  <input type="file" @change="handleImageUpload" class="form-control" accept="image/*" />
+                  <small class="text-muted">Products must have an image. If you don't upload a new one, the current image will be kept.</small>
                 </div>
               </div>
               <div class="modal-footer">
@@ -40,24 +48,71 @@
   </template>
   
   <script>
+  import { getImageUrl } from '../utils/imageHelper';
+
   export default {
     props: ['existingProduct'],
     data() {
       return {
-        product: { ...this.existingProduct }
+        product: { ...this.existingProduct },
+        imageFile: null // Store the actual file object
       };
+    },
+    computed: {
+      currentImageUrl() {
+        if (!this.product.image) return null;
+        return getImageUrl(this.product.image);
+      }
     },
     methods: {
       submit() {
-        this.$emit('update-product', this.product);
-        this.$emit('close');
+        if (!this.product.name || !this.product.price) {
+          alert('Please fill in all required fields.');
+          return;
+        }
+        
+        if (parseFloat(this.product.price) <= 0) {
+          alert('Price must be greater than zero.');
+          return;
+        }
+        
+        if (parseInt(this.product.stock) < 0) {
+          alert('Stock cannot be negative.');
+          return;
+        }
+        
+        // Use FormData to properly handle file uploads
+        const formData = new FormData();
+        formData.append('name', this.product.name);
+        formData.append('description', this.product.description || '');
+        formData.append('price', parseFloat(this.product.price));
+        formData.append('stock', parseInt(this.product.stock));
+        
+        // Only append image if a new file was selected
+        if (this.imageFile) {
+          formData.append('image', this.imageFile);
+        }
+        
+        this.$emit('update-product', { 
+          id: this.product.id,
+          formData,
+          product: {
+            ...this.product,
+            price: parseFloat(this.product.price),
+            stock: parseInt(this.product.stock)
+          }
+        });
       },
       handleImageUpload(event) {
         const file = event.target.files[0];
         if (file) {
+          this.imageFile = file;
+          
+          // Preview the new image
           const reader = new FileReader();
           reader.onload = () => {
-            this.product.image = reader.result;
+            // Just for preview - this doesn't affect the actual product.image yet
+            this.product.imagePreview = reader.result;
           };
           reader.readAsDataURL(file);
         }

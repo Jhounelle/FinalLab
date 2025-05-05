@@ -34,6 +34,14 @@
             <li class="nav-item">
               <router-link class="nav-link" to="/admin/transaction" active-class="active-link">Transactions</router-link>
             </li>
+            <li class="nav-item position-relative">
+              <router-link class="nav-link" to="/cart">
+                <i class="fa-solid fa-cart-shopping fs-5"></i>
+                <span v-if="cartItemCount > 0" class="cart-badge position-absolute">
+                  {{ cartItemCount }}
+                </span>
+              </router-link>
+            </li>
             <li class="nav-item">
               <button class="nav-link btn btn-link" @click="logout">Logout</button>
             </li>
@@ -54,6 +62,9 @@ export default {
     isAdmin() {
       return this.isAuthenticated && this.$store.state.user?.role === 'admin';
     },
+    cartItemCount() {
+      return this.$store.getters.cartItemCount || 0;
+    }
   },
   methods: {
     logout() {
@@ -118,4 +129,14 @@ export default {
   }
 }
 
+/* Cart badge styling */
+.cart-badge {
+  background-color: #ff0000;
+  color: white;
+  font-size: 0.7rem;
+  padding: 0.2rem 0.4rem;
+  border-radius: 50%;
+  top: -5px;
+  right: -5px;
+}
 </style>

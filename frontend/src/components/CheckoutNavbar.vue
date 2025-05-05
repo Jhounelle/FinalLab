@@ -8,6 +8,14 @@
         </div>
         <!-- RIGHT SIDE ICON -->
         <ul class="navbar-nav ms-auto">
+          <li class="nav-item position-relative">
+            <router-link class="nav-link" to="/cart">
+              <i class="fa-solid fa-cart-shopping fs-5"></i>
+              <span v-if="cartItemCount > 0" class="cart-badge position-absolute">
+                {{ cartItemCount }}
+              </span>
+            </router-link>
+          </li>
           <li v-if="!isAuthenticated" class="nav-item">
             <router-link class="nav-link" to="/">
               <i class="fa-solid fa-arrow-right-from-bracket"></i>
@@ -20,8 +28,16 @@
 </template>
 
 <script>
-
-
+export default {
+  computed: {
+    isAuthenticated() {
+      return this.$store.getters.isAuthenticated;
+    },
+    cartItemCount() {
+      return this.$store.getters.cartItemCount || 0;
+    }
+  }
+};
 </script>
 
 <style scoped>
@@ -41,5 +57,16 @@
 .navbar-brand img {
   display: block;
   max-height: 100px;
+}
+
+/* Cart badge styling */
+.cart-badge {
+  background-color: #ff0000;
+  color: white;
+  font-size: 0.7rem;
+  padding: 0.2rem 0.4rem;
+  border-radius: 50%;
+  top: -5px;
+  right: -5px;
 }
 </style>

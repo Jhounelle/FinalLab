@@ -13,6 +13,7 @@
               required
               placeholder="First Name"
             />
+            <div v-if="errors.firstname" class="text-danger">{{ errors.firstname }}</div>
           </div>
           <div class="mb-3">
             <input
@@ -22,6 +23,7 @@
               required
               placeholder="Last Name"
             />
+            <div v-if="errors.lastname" class="text-danger">{{ errors.lastname }}</div>
           </div>
           <div class="mb-3">
             <input
@@ -31,6 +33,7 @@
               required
               placeholder="Location"
             />
+            <div v-if="errors.location" class="text-danger">{{ errors.location }}</div>
           </div>
           <div class="mb-3">
             <input
@@ -40,6 +43,7 @@
               required
               placeholder="Email"
             />
+            <div v-if="errors.email" class="text-danger">{{ errors.email }}</div>
           </div>
           <div class="mb-3">
             <input
@@ -49,6 +53,7 @@
               required
               placeholder="Password"
             />
+            <div v-if="errors.password" class="text-danger">{{ errors.password }}</div>
           </div>
           <div class="mb-3">
             <input
@@ -58,8 +63,12 @@
               required
               placeholder="Confirm Password"
             />
+            <div v-if="errors.confirmpassword" class="text-danger">{{ errors.confirmpassword }}</div>
           </div>
-          <button type="submit" class="btn btn-primary w-100">Register</button>
+          <div v-if="apiError" class="alert alert-danger">{{ apiError }}</div>
+          <button type="submit" class="btn btn-primary w-100" :disabled="isSubmitting">
+            {{ isSubmitting ? 'Registering...' : 'Register' }}
+          </button>
         </form>
         <p class="mt-3 text-center">
           Already have an account?
@@ -71,6 +80,9 @@
 </template>
 
 <script>
+import axios from '../axios';
+import { mapMutations } from 'vuex';
+
 export default {
   data() {
     return {
@@ -81,6 +93,7 @@ export default {
       password: '',
       confirmpassword: '',
       isSubmitting: false,
+      apiError: '',
       errors: {
         firstname: '',
         lastname: '',
@@ -92,6 +105,7 @@ export default {
     };
   },
   methods: {
+    ...mapMutations(['SET_AUTH', 'SET_USER_ROLE', 'SET_AUTH_TOKEN']),
     validateForm() {
       this.errors = {
         firstname: '',
@@ -126,8 +140,8 @@ export default {
       if (!this.password) {
         this.errors.password = 'Password is required.';
         isValid = false;
-      } else if (this.password.length < 6) {
-        this.errors.password = 'Password must be at least 6 characters long.';
+      } else if (this.password.length < 8) {
+        this.errors.password = 'Password must be at least 8 characters long.';
         isValid = false;
       }
 
@@ -138,25 +152,49 @@ export default {
 
       return isValid;
     },
-    submitForm() {
+    async submitForm() {
+      this.apiError = '';
+      
       if (!this.validateForm()) {
         return;
       }
 
       this.isSubmitting = true;
 
-      // Simulate form submission
-      setTimeout(() => {
+      try {
+        const response = await axios.post('/api/register/', {
+          firstName: this.firstname,
+          lastName: this.lastname,
+          email: this.email,
+          password: this.password,
+          location: this.location
+        });
+        
+        console.log('Registration successful:', response.data);
+        
+        // Set authentication state
+        this.SET_AUTH(true);
+        this.SET_USER_ROLE(response.data.role);
+        this.SET_AUTH_TOKEN(response.data.token);
+        
+        // Set the token in axios default headers
+        axios.defaults.headers.common['Authorization'] = `Token ${response.data.token}`;
+        
+        // Redirect to the customer page
+        this.$router.push('/customer');
+      } catch (error) {
+        console.error('Registration error:', error);
+        
+        if (error.response) {
+          this.apiError = error.response.data?.error || 'Registration failed. Please try again.';
+        } else if (error.request) {
+          this.apiError = 'Network error. Please check your connection and try again.';
+        } else {
+          this.apiError = 'An unexpected error occurred. Please try again.';
+        }
+      } finally {
         this.isSubmitting = false;
-        alert('Registration successful!');
-
-        this.firstname = '';
-        this.lastname = '';
-        this.location = '';
-        this.email = '';
-        this.password = '';
-        this.confirmpassword = '';
-      }, 2000);
+      }
     }
   }
 };
@@ -220,10 +258,15 @@ input.form-control:focus {
   transition: background-color 0.3s ease;
 }
 
-.btn-primary:hover {
+.btn-primary:hover:not(:disabled) {
   background-color: rgb(255, 255, 255);
   border: 1px solid #29000a;
   color: #29000a;
+}
+
+.btn-primary:disabled {
+  opacity: 0.65;
+  cursor: not-allowed;
 }
 
 p {
@@ -239,5 +282,21 @@ a {
 
 a:hover {
   text-decoration: underline;
+}
+
+.text-danger {
+  color: #dc3545;
+  font-size: 0.875rem;
+  margin-top: 0.25rem;
+}
+
+.alert-danger {
+  color: #721c24;
+  background-color: #f8d7da;
+  border-color: #f5c6cb;
+  padding: 0.75rem 1.25rem;
+  margin-bottom: 1rem;
+  border: 1px solid transparent;
+  border-radius: 0.25rem;
 }
 </style>

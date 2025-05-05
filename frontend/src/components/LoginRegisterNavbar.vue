@@ -14,125 +14,36 @@
           </router-link>
         </div>
 
-          <ul class="navbar-nav ms-auto">
-            <li v-if="!isAuthenticated" class="nav-item">
-              <router-link class="nav-link" to="/login">
-                <i class="fa-regular fa-user"></i>
-              </router-link>
-            </li>
-          </ul>
+        <ul class="navbar-nav ms-auto">
+          <!-- If the user is NOT authenticated, show login link -->
+          <li v-if="!isAuthenticated" class="nav-item">
+            <router-link class="nav-link" to="/login">
+              <i class="fa-regular fa-user"></i>
+            </router-link>
+          </li>
 
-        <!-- <button
-          class="navbar-toggler"
-          type="button" 
-          data-bs-toggle="offcanvas"
-          data-bs-target="#offcanvasLeftCart"
-          aria-controls="offcanvasLeftCart"
-          aria-expanded="false"
-          aria-label="Toggle navigation"
-        >
-          <span class="navbar-toggler-icon"></span>
-        </button> -->
+          <!-- Show Admin Panel only for Employees -->
+          <li v-if="isAdmin" class="nav-item">
+            <router-link class="nav-link" to="/admin-panel">Admin Panel</router-link>
+          </li>
 
+          <!-- Show Cart for Everyone -->
+          <li class="nav-item position-relative">
+            <router-link class="nav-link" to="/cart">
+              <i class="fa-solid fa-cart-shopping fs-5"></i>
+              <span v-if="cartItemCount > 0" class="cart-badge position-absolute">
+                {{ cartItemCount }}
+              </span>
+            </router-link>
+          </li>
 
-        <!-- Mobile-only avatar and cart -->
-        <!-- <div class="d-lg-none d-flex align-items-center ms-auto">
-          <router-link v-if="!isAuthenticated" class="nav-link text-white me-2" to="/login">
-            <i class="fa-regular fa-user"></i>
-          </router-link>
-
-          <a
-            class="nav-link text-white position-relative"
-            data-bs-toggle="offcanvas"
-            href="#offcanvasCart"
-            role="button"
-            aria-controls="offcanvasCart"
-          >
-            <i class="fa-solid fa-cart-shopping"></i>
-            <span class="cart-badge badge bg-primary position-absolute">
-              {{ cartItemCount }}
-            </span>
-          </a>
-        </div>
-
-        <div class="collapse navbar-collapse" id="navbarNav">
-          <ul class="navbar-nav ms-auto">
-            <li v-if="!isAuthenticated" class="nav-item">
-              <router-link class="nav-link" to="/login">
-                <i class="fa-regular fa-user"></i>
-              </router-link>
-            </li>
-
-            <li class="nav-item position-relative">
-              <a
-                class="nav-link"
-                data-bs-toggle="offcanvas"
-                href="#offcanvasCart"
-                role="button"
-                aria-controls="offcanvasCart"
-              >
-                <div class="cart-icon-wrapper position-relative d-inline-block">
-                  <i class="fa-solid fa-cart-shopping"></i>
-                  <span class="cart-badge badge bg-primary position-absolute">
-                    {{ cartItemCount }}
-                  </span>
-                </div>
-              </a>
-            </li>
-
-            <li v-if="isAdmin" class="nav-item">
-              <router-link class="nav-link" to="/admin-panel">Admin Panel</router-link>
-            </li>
-
-            <li v-if="isAuthenticated" class="nav-item">
-              <button class="nav-link btn btn-link" @click="logout">Logout</button>
-            </li>
-          </ul>
-        </div> -->
+          <!-- If authenticated, show logout button -->
+          <li v-if="isAuthenticated" class="nav-item">
+            <button class="nav-link btn btn-link" @click="logout">Logout</button>
+          </li>
+        </ul>
       </div>
     </nav>
-
-    <!-- OFFCANVAS CART -->
-    <!-- <div
-      class="offcanvas offcanvas-end"
-      tabindex="-1"
-      id="offcanvasCart"
-      aria-labelledby="offcanvasCartLabel"
-    >
-      <div class="offcanvas-header">
-        <h5 id="offcanvasCartLabel">Cart</h5>
-        <button
-          type="button"
-          class="btn-close text-reset"
-          data-bs-dismiss="offcanvas"
-          aria-label="Close"
-        ></button>
-      </div>
-      <div class="offcanvas-body">
-        <CartForm />
-      </div>
-    </div> -->
-
-    <!-- OFFCANVAS LEFTCART -->
-    <!-- <div
-      class="offcanvas offcanvas-start"
-      tabindex="-1"
-      id="offcanvasLeftCart"
-      aria-labelledby="offcanvasLeftCartLabel"
-    >
-      <div class="offcanvas-header">
-        <h5 id="offcanvasLeftCartLabel">Cart</h5>
-        <button
-          type="button"
-          class="btn-close text-reset"
-          data-bs-dismiss="offcanvas"
-          aria-label="Close"
-        ></button>
-      </div>
-      <div class="offcanvas-body">
-        <MobileSidebar />
-      </div>
-    </div>-->
   </div>
 </template>
 
@@ -151,7 +62,7 @@ export default {
       return this.$store.getters.isAuthenticated;
     },
     isAdmin() {
-      return this.isAuthenticated && this.$store.state.user?.role === 'admin';
+      return this.isAuthenticated && this.$store.getters.isAdmin;
     },
   },
   methods: {
@@ -205,16 +116,13 @@ export default {
 }
 
 .cart-badge {
-  top: -8px;
-  right: -10px;
+  background-color: #ff0000;
+  color: white;
+  font-size: 0.7rem;
+  padding: 0.2rem 0.4rem;
   border-radius: 50%;
-  padding: 4px 6px;
-  font-size: 10px;
-  min-width: 18px;
-  height: 18px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  top: -5px;
+  right: -5px;
 }
 
 </style>

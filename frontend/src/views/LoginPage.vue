@@ -39,6 +39,9 @@
               placeholder="Password"
             />
           </div>
+          <div v-if="errorMessage" class="alert alert-danger">
+            {{ errorMessage }}
+          </div>
           <button type="submit" class="btn btn-primary w-100">Login</button>
         </form>
 
@@ -55,6 +58,7 @@
 </template>
 
 <script>
+import axios from '../axios';
 import { mapMutations } from 'vuex';
 
 export default {
@@ -62,25 +66,68 @@ export default {
     return {
       email: '',
       password: '',
-      role: 'customer' // Default tab
+      role: 'customer',
+      loading: false,
+      errorMessage: ''
     };
   },
   methods: {
-    ...mapMutations(['SET_AUTH']),
+    ...mapMutations(['SET_AUTH', 'SET_USER_ROLE', 'SET_AUTH_TOKEN']),
     handleLogin() {
       if (this.email && this.password) {
-        this.SET_AUTH(true);
-        this.$store.commit('SET_ROLE', this.role);
-
-        alert(`${this.role.toUpperCase()} login successful!`);
-
-        if (this.role === 'admin') {
-          this.$router.push('/admin/product'); // ✅ go to admin product page
-        } else {
-          this.$router.push('/customer'); // ✅ go to customer page
-        }
+        this.errorMessage = '';
+        this.loading = true;
+        
+        axios.post('/api/token/', {
+          email: this.email,
+          password: this.password
+        })
+        .then(response => {
+          console.log('Login response:', response.data); // Debug log
+          const { token, role } = response.data;
+          
+          // Check if user's actual role matches the selected role
+          if (role !== this.role) {
+            this.errorMessage = `You do not have ${this.role} permissions. Please select the correct role.`;
+            return;
+          }
+          
+          // Set authentication state
+          this.SET_AUTH(true);
+          this.SET_USER_ROLE(role);
+          this.SET_AUTH_TOKEN(token);
+          
+          // Set the token in axios default headers
+          axios.defaults.headers.common['Authorization'] = `Token ${token}`;
+          
+          // Redirect based on role
+          if (role === 'admin') {
+            this.$router.push('/admin/product');
+          } else {
+            this.$router.push('/customer');
+          }
+        })
+        .catch(error => {
+          console.error("Login error:", error);
+          
+          if (error.response) {
+            console.error("Response data:", error.response.data);
+            console.error("Response status:", error.response.status);
+            this.errorMessage = error.response.data?.error || 
+                               error.response.data?.detail || 
+                               "Invalid credentials. Please check your email and password.";
+          } else if (error.request) {
+            console.error("Request error:", error.request);
+            this.errorMessage = "Network error. Please check your connection and try again.";
+          } else {
+            this.errorMessage = "An unexpected error occurred. Please try again.";
+          }
+        })
+        .finally(() => {
+          this.loading = false;
+        });
       } else {
-        alert('Invalid credentials.');
+        this.errorMessage = "Please enter both email and password.";
       }
     }
   }

@@ -1,140 +1,286 @@
 <template>
-  <div class="checkout container-fluid">
-    <div class="row w-100 m-0">
+  <div class="checkout container py-5">
+    <div class="row">
 
-      <!-- Left Column: Checkout Summary -->
-      <div class="col-12 col-md-6">
-        <div v-if="cart.length === 0">
-          <p>Your cart is empty. Please add some items to proceed.</p>
-          <router-link to="/store" class="btn btn-primary">Go to Store</router-link>
+      <!-- Order Success Message -->
+      <div v-if="orderSuccess" class="col-12 text-center mb-4">
+        <div class="alert alert-success mb-4">
+          <h4>Your order has been placed successfully!</h4>
+          <p>You will be redirected to the homepage in a moment...</p>
         </div>
+        <router-link to="/" class="btn btn-primary">
+          Continue Shopping
+        </router-link>
+      </div>
 
-        <div v-else>
-          <h3 class="pb-3">Order Summary</h3>
-          <div class="cart-items mb-3">
-            <div class="cart-item" v-for="item in cart" :key="item.id">
-              <p>{{ item.name }} - ${{ item.price }}</p>
+      <!-- Main Checkout UI -->
+      <template v-else>
+        <!-- Left Column: Checkout Summary -->
+        <div class="col-12 col-md-6 mb-4">
+          <div v-if="!cart.length">
+            <div class="alert alert-warning">
+              <p>Your cart is empty. Please add some items to proceed.</p>
+            </div>
+            <router-link to="/" class="btn btn-primary">Back to Store</router-link>
+          </div>
+
+          <div v-else>
+            <h3 class="mb-4">Order Summary</h3>
+            <div class="cart-items mb-4">
+              <table class="table table-hover align-middle">
+                <thead class="table-light">
+                  <tr>
+                    <th scope="col">Product</th>
+                    <th scope="col">Price</th>
+                    <th scope="col">Quantity</th>
+                    <th scope="col">Subtotal</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr v-for="item in cart" :key="item.id">
+                    <td>{{ item.name }}</td>
+                    <td>₱{{ item.price }}</td>
+                    <td>{{ item.quantity }}</td>
+                    <td>₱{{ item.price * item.quantity }}</td>
+                  </tr>
+                </tbody>
+                <tfoot>
+                  <tr class="table-light">
+                    <td colspan="3" class="text-end fw-bold">Total</td>
+                    <td class="fw-bold">₱{{ totalAmount }}</td>
+                  </tr>
+                </tfoot>
+              </table>
             </div>
           </div>
-          <div class="total">
-            <p><strong>Total:</strong> ${{ totalPrice }}</p>
+        </div>
+
+        <!-- Right Column: Payment Form -->
+        <div class="col-12 col-md-6">
+          <div v-if="cart.length" class="card shadow-sm p-4">
+            <h3 class="mb-4">Payment</h3>
+
+            <!-- Error Message -->
+            <div v-if="errorMessage" class="alert alert-danger mb-4">
+              {{ errorMessage }}
+            </div>
+
+            <form @submit.prevent="processOrder">
+              <!-- Basic Info -->
+              <div class="mb-3">
+                <label for="fullName" class="form-label">Full Name</label>
+                <input type="text" id="fullName" v-model="orderDetails.fullName" class="form-control" required>
+              </div>
+
+              <div class="mb-3">
+                <label for="email" class="form-label">Email</label>
+                <input type="email" id="email" v-model="orderDetails.email" class="form-control" required>
+              </div>
+
+              <div class="mb-3">
+                <label for="phone" class="form-label">Phone Number</label>
+                <input type="tel" id="phone" v-model="orderDetails.phone" class="form-control" required>
+              </div>
+
+              <!-- Payment Method -->
+              <div class="mb-4">
+                <label class="form-label">Payment Method</label>
+                <div class="payment-options">
+                  <div v-for="method in paymentMethods" :key="method.value" class="payment-option">
+                    <div class="form-check">
+                      <input 
+                        type="radio" 
+                        :id="method.value" 
+                        :value="method.value" 
+                        v-model="orderDetails.paymentMethod" 
+                        class="form-check-input"
+                        required
+                      >
+                      <label :for="method.value" class="form-check-label ps-2">{{ method.label }}</label>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Actions -->
+              <div class="d-flex gap-2">
+                <button type="submit" class="btn btn-primary flex-grow-1" :disabled="isSubmitting">
+                  {{ isSubmitting ? 'Processing...' : 'Place Order' }}
+                </button>
+                <router-link to="/" class="btn btn-outline-secondary">Cancel</router-link>
+              </div>
+            </form>
           </div>
         </div>
-      </div>
-
-      <!-- Right Column: Form -->
-      <div class="col-12 col-md-6">
-        <form @submit.prevent="submitOrder">
-          <h3  class="pb-3">Delivery</h3>
-
-          <div class="form-group mb-3">
-            <input type="text" id="country" v-model="country" class="form-control" placeholder="Country" required>
-          </div>
-
-          <div class="form-group mb-3 d-flex gap-2">
-            <input type="text" id="fname" v-model="fname" class="form-control" placeholder="First Name" required>
-            <input type="text" id="lname" v-model="lname" class="form-control" placeholder="Last Name" required>
-          </div>
-
-          <div class="form-group mb-3">
-            <input type="text" id="address" v-model="address" class="form-control" placeholder="Address" required>
-          </div>
-
-          <div class="form-group mb-3 d-flex gap-2">
-            <input type="text" id="postal" v-model="postal" class="form-control" placeholder="Postal Code" required>
-            <input type="text" id="city" v-model="city" class="form-control" placeholder="City" required>
-          </div>
-
-          <div class="form-group mb-3">
-            <input type="text" id="region" v-model="region" class="form-control" placeholder="Region" required>
-          </div>
-
-          <div class="form-group mb-3">
-            <input type="text" id="contact" v-model="contact" class="form-control" placeholder="Contact No." required>
-          </div>
-
-          <div class="form-group mb-3">
-            <label class="mb-1" for="payment">Payment Method</label>
-            <select id="payment" v-model="paymentMethod" class="form-control" required>
-              <option value="" disabled selected hidden>Choose a payment method...</option>
-              <option value="credit-card">Credit Card</option>
-              <option value="paypal">PayPal</option>
-              <option value="gcash">GCash</option>
-              <option value="bank-transfer">Bank Transfer</option>
-            </select>
-          </div>
-
-          <div class="d-flex gap-2">
-            <button type="submit" class="btn btn-success">Place Order</button>
-            <router-link to="/customer" class="btn btn-secondary">Cancel</router-link>
-          </div>
-        </form>
-      </div>
+      </template>
 
     </div>
   </div>
 </template>
 
 <script>
+import { mapState, mapGetters, mapActions } from 'vuex';
+
 export default {
   data() {
     return {
-      cart: [
-        { id: 1, name: 'Sample Item', price: 29.99 },
-        { id: 2, name: 'Another Item', price: 49.99 }
+      orderDetails: {
+        fullName: '',
+        email: '',
+        phone: '',
+        paymentMethod: '',
+        // Adding a simple address field that gets populated in submit
+        address: 'Default Pickup'
+      },
+      paymentMethods: [
+        { label: 'Credit Card', value: 'credit-card' },
+        { label: 'PayPal', value: 'paypal' },
+        { label: 'GCash', value: 'gcash' },
+        { label: 'Bank Transfer', value: 'bank-transfer' },
+        { label: 'Cash on Delivery', value: 'cod' }
       ],
-      name: '',
-      address: '',
-      paymentMethod: '',
+      errorMessage: '',
+      isSubmitting: false,
+      orderSuccess: false
     };
   },
   computed: {
-    totalPrice() {
-      return this.cart.reduce((sum, item) => sum + item.price, 0).toFixed(2);
+    ...mapState(['products']),
+    ...mapGetters(['cartTotal', 'cart']),
+    totalAmount() {
+      return this.cart && this.cart.length 
+        ? this.cart.reduce((sum, item) => sum + (item.price * item.quantity), 0)
+        : 0;
     }
   },
   methods: {
-    submitOrder() {
-      alert(`Order placed for ${this.name}!\nTotal: $${this.totalPrice}`);
-      // Reset cart and form fields (optional)
-      this.cart = [];
-      this.name = '';
-      this.address = '';
-      this.paymentMethod = '';
+    ...mapActions(['submitOrder', 'fetchProducts']),
+    
+    validateStock() {
+      // Check if all items are still in stock
+      for (const cartItem of this.cart) {
+        const product = this.products.find(p => p.id === cartItem.id);
+        if (!product) {
+          return { valid: false, message: 'A product in your cart is no longer available.' };
+        }
+        if (product.stock < cartItem.quantity) {
+          return { 
+            valid: false, 
+            message: `Cannot complete order. ${product.name} has insufficient stock (only ${product.stock} available).` 
+          };
+        }
+      }
+      return { valid: true };
+    },
+    
+    async processOrder() {
+      if (!this.cart.length) {
+        this.errorMessage = 'Your cart is empty. Please add items before checkout.';
+        return;
+      }
+
+      this.isSubmitting = true;
+      this.errorMessage = '';
+      
+      // First refresh the product data to ensure we have the latest stock info
+      await this.fetchProducts();
+      
+      // Validate stock after refreshing products
+      const stockCheck = this.validateStock();
+      if (!stockCheck.valid) {
+        this.errorMessage = stockCheck.message;
+        this.isSubmitting = false;
+        return;
+      }
+
+      try {
+        // Format the order data precisely how the backend expects it
+        const orderData = {
+          full_name: this.orderDetails.fullName,
+          email: this.orderDetails.email,
+          phone: this.orderDetails.phone,
+          address: this.orderDetails.address,
+          total_amount: this.totalAmount,
+          order_items: this.cart.map(item => ({
+            product: item.id,
+            quantity: item.quantity,
+            price: item.price
+          }))
+        };
+        
+        console.log('Sending order data:', orderData);
+        
+        const result = await this.submitOrder(orderData);
+        
+        if (result.success) {
+          this.orderSuccess = true;
+          // Automatically redirect after a successful order
+          setTimeout(() => {
+            this.$router.push('/');
+          }, 2000);
+        } else {
+          this.errorMessage = result.message || 'Failed to place your order. Please try again.';
+        }
+      } catch (error) {
+        console.error('Order submission error:', error);
+        this.errorMessage = 'An unexpected error occurred. Please try again.';
+      } finally {
+        this.isSubmitting = false;
+      }
+    }
+  },
+  mounted() {
+    // Make sure products are loaded
+    if (!this.products.length) {
+      this.fetchProducts();
     }
   }
 };
 </script>
 
 <style scoped>
-* {
-  font-family: 'Poppins', sans-serif;
+.checkout {
+  min-height: 80vh;
+  position: relative;
+  z-index: 1;
 }
 
-  .checkout {
-    width: 80%;
-    padding-top: 30px;
-    padding-bottom: 90px;
-    border: 2px solid black;
-  }
+.payment-options {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  gap: 15px;
+  margin-top: 10px;
+}
 
-  .row {
-    margin: 0;
-    width: 100%;
-  }
+.payment-option {
+  padding: 15px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+}
 
-  .cart-items {
-    margin-bottom: 20px;
-  }
+.payment-option:hover {
+  background-color: #f8f9fa;
+  transform: translateY(-2px);
+  box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+}
 
-  .cart-item {
-    margin-bottom: 10px;
-  }
+.form-check-input:checked ~ .form-check-label {
+  font-weight: bold;
+}
 
-  .total {
-    font-weight: bold;
-    margin-top: 25px;
-  }
+.payment-option .form-check-input:checked + .form-check-label {
+  color: #0d6efd;
+}
 
+.table td {
+  vertical-align: middle;
+}
 
+/* Prevent backend overlay from interfering */
+.modal-backdrop {
+  display: none;
+}
 </style>
