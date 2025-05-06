@@ -72,7 +72,6 @@ const router = createRouter({
   routes
 });
 
-// Navigation guards
 router.beforeEach((to, from, next) => {
   const requiresAuth = to.matched.some(record => record.meta.requiresAuth);
   const requiresAdmin = to.matched.some(record => record.meta.requiresAdmin);
@@ -81,22 +80,19 @@ router.beforeEach((to, from, next) => {
   const isAdmin = store.getters.isAdmin;
   const isCustomer = store.getters.isCustomer;
 
-  // If route requires authentication and user is not authenticated
   if (requiresAuth && !isAuthenticated) {
     next('/login');
   } 
-  // If route requires admin role and user is not admin
   else if (requiresAdmin && !isAdmin) {
-    // Redirect to customer home if authenticated but not admin
     if (isAuthenticated) {
       next('/customer');
     } else {
       next('/login');
     }
   }
-  // If route requires customer role and user is not customer
+  
+
   else if (requiresCustomer && !isCustomer) {
-    // Redirect to admin panel if authenticated but not customer
     if (isAuthenticated && isAdmin) {
       next('/admin/product');
     } else {

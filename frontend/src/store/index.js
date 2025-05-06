@@ -1,23 +1,19 @@
 import { createStore } from 'vuex';
 import axios from '../axios';
 
-// Helper function for safe API requests with fallback data
 const safeRequest = async (endpoint, fallbackData, errorMessage = 'API request failed') => {
   try {
     const response = await axios.get(endpoint);
     return response.data;
   } catch (error) {
     console.error(`${errorMessage}:`, error);
-    // Only fall back to sample data if there was an actual error, not just an empty response
     if (error.response && error.response.status === 404) {
       console.warn('API endpoint not found, using fallback data');
       return fallbackData;
     }
-    // For other types of errors, check if we got a valid response with empty data
     if (error.response && error.response.data) {
       return error.response.data;
     }
-    // Last resort: use fallback data
     return fallbackData;
   }
 };
@@ -36,15 +32,12 @@ export default createStore({
       state.products = products;
     },
     ADD_TO_CART(state, product) {
-      // Initialize cart if undefined
       if (!state.cart) {
         state.cart = [];
       }
       
-      // Check if product already has a quantity specified
       const productQuantity = product.quantity || 1;
       
-      // Ensure price is a number
       const productToAdd = {
         ...product,
         price: parseFloat(product.price),
@@ -53,9 +46,8 @@ export default createStore({
       
       const existing = state.cart.find(item => item.id === product.id);
       if (existing) {
-        // If the product already has a specified quantity, add that quantity
         existing.quantity += productQuantity;
-        existing.price = parseFloat(existing.price); // Ensure price is a number
+        existing.price = parseFloat(existing.price); 
       } else {
         state.cart.push(productToAdd);
       }
@@ -78,9 +70,7 @@ export default createStore({
       
       const item = state.cart.find(item => item.id === id);
       if (item) {
-        // Ensure quantity is a number and at least 1
         item.quantity = Math.max(1, parseInt(quantity) || 1);
-        // Also ensure price is a number
         item.price = parseFloat(item.price);
         localStorage.setItem('cart', JSON.stringify(state.cart));
       }
@@ -118,7 +108,6 @@ export default createStore({
     async fetchProducts({ commit, state }) {
       console.log('Fetching products with role:', state.userRole);
       
-      // Default to public products for unauthenticated users
       let endpoint = '/api/public/products/';
       
       if (state.isAuthenticated) {
@@ -128,7 +117,7 @@ export default createStore({
           endpoint = '/api/customer/products/';
         }
       }
-      
+    
       // Sample data as fallback
       const sampleProducts = [
         {
